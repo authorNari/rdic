@@ -23,7 +23,7 @@ static VALUE xselection_open(VALUE self,VALUE display_name)
     VALUE r_last_str;
     
     Check_Type(display_name, T_STRING);
-    display = XOpenDisplay(RSTRING(display_name)->ptr);
+    display = XOpenDisplay(RSTRING_PTR(display_name));
     
     if(!display)
         rb_raise(rb_eRuntimeError, "illegal DISPLAY");
@@ -151,8 +151,8 @@ static VALUE xselection_check(VALUE self)
     
     str_len_now = strlen(xtextproperty.value);
     str_last = rb_iv_get(self, "@last_str");
-    str_len_last = RSTRING(str_last)->len;
-    char_last = STR2CSTR(str_last);
+    str_len_last = RSTRING_LEN(str_last);
+    char_last = StringValuePtr(str_last);
     
     if (str_len_now == str_len_last){
         if (strncmp(xtextproperty.value, char_last, str_len_now) == 0){

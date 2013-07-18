@@ -1,0 +1,4679 @@
+#!/usr/bin/env ruby
+# -*- coding: euc-jp -*-
+#
+#
+#
+#
+#
+
+RDIC_VERSION = "0.1.8 (20050422)"
+
+module Stem
+  extend self
+
+  IRREGULAR_VERB_LIST = {
+    "arisen" => "arise", "arose" => "arise", "arise" => "arise", 
+    "awoken" => "awake", "awakened" => "awake", "awoke" => "awake", "awake" => "awake", 
+    "been" => "be", "were" => "be", "was" => "be", "be" => "be", 
+    "borne" => "bear", "born" => "bear", "bore" => "bear", "bear" => "bear", 
+    "beat" => "beat", "beaten" => "beat", 
+    "become" => "become", "became" => "become", 
+    "befallen" => "befall", "befell" => "befall", "befall" => "befall", 
+    "begun" => "begin", "began" => "begin", "begin" => "begin", 
+    "beheld" => "behold", "behold" => "behold", 
+    "bent" => "bend", "bend" => "bend", 
+    "betted" => "bet", "bet" => "bet", 
+    "bid" => "bid", 
+    "bound" => "bind", "bind" => "bind", 
+    "bitten" => "bite", "bit" => "bite", "bite" => "bite", 
+    "bled" => "bleed", "bleed" => "bleed", 
+    "blown" => "blow", "blew" => "blow", "blow" => "blow", 
+    "broken" => "break", "broke" => "break", "break" => "break", 
+    "bred" => "breed", "breed" => "breed", 
+    "brought" => "bring", "bring" => "bring", 
+    "broadcast" => "broadcast", 
+    "browbeat" => "browbeat", 
+    "built" => "build", "build" => "build", 
+    "burntburned" => "burn", "burned" => "burn", "burnt" => "burn", "burn" => "burn", 
+    "burst" => "burst", 
+    "bust" => "bust", "busted" => "bust", 
+    "bought" => "buy", "buy" => "buy", 
+    "cast" => "cast", 
+    "caught" => "catch", "catch" => "catch", 
+    "chosen" => "choose", "chose" => "choose", "choose" => "choose", 
+    "clung" => "cling", "cling" => "cling", 
+    "come" => "come", "came" => "come", 
+    "cost" => "cost", 
+    "crept" => "creep", "creep" => "creep", 
+    "cut" => "cut", 
+    "dealt" => "deal", "deal" => "deal", 
+    "dug" => "dig", "dig" => "dig", 
+    "dived" => "dive", "dive" => "dive", 
+    "dove" => "dive", 
+    "done" => "do", "did" => "do", "do" => "do", 
+    "drawn" => "draw", "drew" => "draw", "draw" => "draw", 
+    "dreamed" => "dream", "dreamt" => "dream", "dream" => "dream", 
+    "drunk" => "drink", "drank" => "drink", "drink" => "drink", 
+    "driven" => "drive", "drove" => "drive", "drive" => "drive", 
+    "dwelled" => "dwell", "dwelt" => "dwell", "dwell" => "dwell", 
+    "eaten" => "eat", "ate" => "eat", "eat" => "eat", 
+    "fallen" => "fall", "fell" => "fall", "fall" => "fall", 
+    "fed" => "feed", "feed" => "feed", 
+    "felt" => "feel", "feel" => "feel", 
+    "fought" => "fight", "fight" => "fight", 
+    "found" => "find", "find" => "find", 
+    "fit" => "fit", 
+    "fitted" => "fit", 
+    "fled" => "flee", "flee" => "flee", 
+    "flung" => "fling", "fling" => "fling", 
+    "flown" => "fly", "flew" => "fly", "fly" => "fly", 
+    "forbidden" => "forbid", "forbade" => "forbid", "forbid" => "forbid", 
+    "forecast" => "forecast", 
+    "foregone" => "forego", "forewent" => "forego", "forego" => "forego", 
+    "foreseen" => "foresee", "foresaw" => "foresee", "foresee" => "foresee", 
+    "foretold" => "foretell", "foretell" => "foretell", 
+    "forgotten" => "forget", "forgot" => "forget", "forget" => "forget", 
+    "forgiven" => "forgive", "forgave" => "forgive", "forgive" => "forgive", 
+    "forsaken" => "forsake", "forsook" => "forsake", "forsake" => "forsake", 
+    "frozen" => "freeze", "froze" => "freeze", "freeze" => "freeze", 
+    "got" => "get", "gotten" => "get", "get" => "get", 
+    "given" => "give", "gave" => "give", "give" => "give", 
+    "gone" => "go", "went" => "go", "go" => "go", 
+    "ground" => "grind", "grind" => "grind", 
+    "grown" => "grow", "grew" => "grow", "grow" => "grow", 
+    "hung" => "hang", "hang" => "hang", 
+    "had" => "have", "have" => "have", 
+    "heard" => "hear", "hear" => "hear", 
+    "hidden" => "hide", "hid" => "hide", "hide" => "hide", 
+    "hit" => "hit", 
+    "held" => "hold", "hold" => "hold", 
+    "hurt" => "hurt", 
+    "input" => "input", 
+    "inset" => "inset", 
+    "interbreda" => "interbreed", "interbreed" => "interbreed", 
+    "interwoven" => "interweave", "interwove" => "interweave", "interweave" => "interweave", 
+    "kept" => "keep", "keep" => "keep", 
+    "kneeled" => "kneel", "knelt" => "kneel", "kneel" => "kneel", 
+    "knitted" => "knit", "knit" => "knit", 
+    "known" => "know", "knew" => "know", "know" => "know", 
+    "laid" => "lay", "lay" => "lay", 
+    "led" => "lead", "lead" => "lead", 
+    "leant" => "lean", "leaned" => "lean", "lean" => "lean", 
+    "leaped" => "leap", "leapt" => "leap", "leap" => "leap", 
+    "learnt" => "learn", "learned" => "learn", "learn" => "learn", 
+    "left" => "leave", "leave" => "leave", 
+    "lent" => "lend", "lend" => "lend", 
+    "let" => "let", 
+    "lain" => "lie", "lie" => "lie", 
+    "lighted" => "light", "lit" => "light", "light" => "light", 
+    "lost" => "lose", "lose" => "lose", 
+    "made" => "make", "make" => "make", 
+    "meant" => "mean", "mean" => "mean", 
+    "met" => "meet", "meet" => "meet", 
+    "misheard" => "mishear", "mishear" => "mishear", 
+    "mislaid" => "mislay", "mislay" => "mislay", 
+    "misled" => "mislead", "mislead" => "mislead", 
+    "misread" => "misread", 
+    "misspelt" => "misspell", "misspelled" => "misspell", "misspell" => "misspell", 
+    "mistaken" => "mistake", "mistook" => "mistake", "mistake" => "mistake", 
+    "misunderstood" => "misunderstand", "misunderstand" => "misunderstand", 
+    "mow" => "mow", "mowed" => "mow", 
+    "outbid" => "outbid", 
+    "outdone" => "outdo", "outdid" => "outdo", "outdo" => "outdo", 
+    "outgrown" => "outgrow", "outgrew" => "outgrow", "outgrow" => "outgrow", 
+    "outrun" => "outrun", "outran" => "outrun", 
+    "outsold" => "outsell", "outsell" => "outsell", 
+    "overcast" => "overcast", 
+    "overcome" => "overcome", "overcame" => "overcome", 
+    "overdone" => "overdo", "overdid" => "overdo", "overdo" => "overdo", 
+    "overdrawn" => "overdraw", "overdrew" => "overdraw", "overdraw" => "overdraw", 
+    "overeaten" => "overeat", "overate" => "overeat", "overeat" => "overeat", 
+    "overhung" => "overhang", "overhang" => "overhang", 
+    "overheard" => "overhear", "overhear" => "overhear", 
+    "overlaid" => "overlay", "overlay" => "overlay", 
+    "overlain" => "overlie", "overlie" => "overlie", 
+    "overpaid" => "overpay", "overpay" => "overpay", 
+    "overridden" => "override", "overrode" => "override", "override" => "override", 
+    "overrun" => "overrun", "overran" => "overrun", 
+    "overseen" => "oversee", "oversaw" => "oversee", "oversee" => "oversee", 
+    "oversold" => "oversell", "oversell" => "oversell", 
+    "overshot" => "overshoot", "overshoot" => "overshoot", 
+    "overslept" => "oversleep", "oversleep" => "oversleep", 
+    "overtaken" => "overtake", "overtook" => "overtake", "overtake" => "overtake", 
+    "overthrown" => "overthrow", "overthrew" => "overthrow", "overthrow" => "overthrow", 
+    "partaken" => "partake", "partook" => "partake", "partake" => "partake", 
+    "paid" => "pay", "pay" => "pay", 
+    "pleaded" => "plead", "pled" => "plead", "plead" => "plead", 
+    "pre-set" => "pre-set", 
+    "proofread" => "proofread", 
+    "proved" => "prove", "proven" => "prove", "prove" => "prove", 
+    "put" => "put", 
+    "quitted" => "quit", "quit" => "quit", 
+    "read" => "read", 
+    "rebound" => "rebind", "rebind" => "rebind", 
+    "rebuilt" => "rebuild", "rebuild" => "rebuild", 
+    "recast" => "recast", 
+    "redone" => "redo", "redid" => "redo", "redo" => "redo", 
+    "re-laid" => "re-lay", "re-lay" => "re-lay", 
+    "remade" => "remake", "remake" => "remake", 
+    "repaid" => "repay", "repay" => "repay", 
+    "rerun" => "rerun", "reran" => "rerun", 
+    "resold" => "resell", "resell" => "resell", 
+    "reset" => "reset", 
+    "rethought" => "rethink", "rethink" => "rethink", 
+    "rewound" => "rewind", "rewind" => "rewind", 
+    "rewritten" => "rewrite", "rewrote" => "rewrite", "rewrite" => "rewrite", 
+    "rid" => "rid", 
+    "ridden" => "ride", "rode" => "ride", "ride" => "ride", 
+    "rung" => "ring", "rang" => "ring", "ring" => "ring", 
+    "risen" => "rise", "rose" => "rise", "rise" => "rise", 
+    "run" => "run", "ran" => "run", 
+    "said" => "say", "say" => "say", 
+    "seen" => "see", "saw" => "see", "see" => "see", 
+    "sought" => "seek", "seek" => "seek", 
+    "sold" => "sell", "sell" => "sell", 
+    "sent" => "send", "send" => "send", 
+    "set" => "set", 
+    "sewed" => "sew", "sewn" => "sew", "sew" => "sew", 
+    "shaken" => "shake", "shook" => "shake", "shake" => "shake", 
+    "sheared" => "shear", "shorn" => "shear", "shear" => "shear", 
+    "shed" => "shed", 
+    "shone" => "shine", "shined" => "shine", "shine" => "shine", 
+    "shat" => "shit", "shit" => "shit", 
+    "shot" => "shoot", "shoot" => "shoot", 
+    "showed" => "show", "shown" => "show", "show" => "show", 
+    "shrunk" => "shrink", "shrank" => "shrink", "shrink" => "shrink", 
+    "shut" => "shut", 
+    "sung" => "sing", "sang" => "sing", "sing" => "sing", 
+    "sat" => "sit", "sit" => "sit", 
+    "slain" => "slay", "slew" => "slay", "slay" => "slay", 
+    "slept" => "sleep", "sleep" => "sleep", 
+    "slid" => "slide", "slide" => "slide", 
+    "slung" => "sling", "sling" => "sling", 
+    "slit" => "slit", 
+    "smelt" => "smell", "smelled" => "smell", "smell" => "smell", 
+    "spoken" => "speak", "spoke" => "speak", "speak" => "speak", 
+    "speeded" => "speed", "sped" => "speed", "speed" => "speed", 
+    "spelt" => "spell", "spelled" => "spell", "spell" => "spell", 
+    "spent" => "spend", "spend" => "spend", 
+    "spun" => "spin", "spin" => "spin", 
+    "spat" => "spit", "spit" => "spit", 
+    "split" => "split", 
+    "spoilt" => "spoil", "spoiled" => "spoil", "spoil" => "spoil", 
+    "spoon-fed" => "spoon-feed", "spoon-feed" => "spoon-feed", 
+    "spread" => "spread", 
+    "sprung" => "spring", "sprang" => "spring", "spring" => "spring", 
+    "stood" => "stand", "stand" => "stand", 
+    "stolen" => "steal", "stole" => "steal", "steal" => "steal", 
+    "stuck" => "stick", "stick" => "stick", 
+    "stung" => "sting", "sting" => "sting", 
+    "stunk" => "stink", "stank" => "stink", "stink" => "stink", 
+    "strewed" => "strew", "strewn" => "strew", "strew" => "strew", 
+    "stridden" => "stride", "strode" => "stride", "stride" => "stride", 
+    "striven" => "strive", "strove" => "strive", "strive" => "strive", 
+    "stricken" => "strike", "struck" => "strike", "strike" => "strike", 
+    "strung" => "string", "string" => "string", 
+    "strived" => "strive", 
+    "sworn" => "swear", "swore" => "swear", "swear" => "swear", 
+    "swept" => "sweep", "sweep" => "sweep", 
+    "swelled" => "swell", "swollen" => "swell", "swell" => "swell", 
+    "swum" => "swim", "swam" => "swim", "swim" => "swim", 
+    "swung" => "swing", "swing" => "swing", 
+    "taken" => "take", "took" => "take", "take" => "take", 
+    "taught" => "teach", "teach" => "teach", 
+    "torn" => "tear", "tore" => "tear", "tear" => "tear", 
+    "told" => "tell", "tell" => "tell", 
+    "thought" => "think", "think" => "think", 
+    "thrown" => "throw", "threw" => "throw", "throw" => "throw", 
+    "thrust" => "thrust", 
+    "trod" => "tread", "trodden" => "tread", "tread" => "tread", 
+    "unbound" => "unbind", "unbind" => "unbind", 
+    "underlain" => "underlie", "underlay" => "underlie", "underlie" => "underlie", 
+    "understood" => "understand", "understand" => "understand", 
+    "undertaken" => "undertake", "undertook" => "undertake", "undertake" => "undertake", 
+    "underwritten" => "underwrite", "underwrote" => "underwrite", "underwrite" => "underwrite", 
+    "undone" => "undo", "undid" => "undo", "undo" => "undo", 
+    "unwound" => "unwind", "unwind" => "unwind", 
+    "upheld" => "uphold", "uphold" => "uphold", 
+    "upset" => "upset", 
+    "waked" => "wake", "woken" => "wake", "woke" => "wake", "wake" => "wake", 
+    "worn" => "wear", "wore" => "wear", "wear" => "wear", 
+    "woven" => "weave", "wove" => "weave", "weave" => "weave", 
+    "wedded" => "wed", "wed" => "wed", 
+    "wept" => "weep", "weep" => "weep", 
+    "wetted" => "wet", "wet" => "wet", 
+    "won" => "win", "win" => "win", 
+    "wound" => "wind", "wind" => "wind", 
+    "withdrawn" => "withdraw", "withdrew" => "withdraw", "withdraw" => "withdraw", 
+    "wrung" => "wring", "wring" => "wring", 
+    "written" => "write", "wrote" => "write", "write" => "write",
+
+    "have" => "have", "had" => "have", "has" => "have", "haven't" => "have", "hasn't" => "have", "hadn't" => "have", 
+    "is" => "be", "are" => "be", "am" => "be", "isn't" => "be", "aren't" => "be", "wasn't" => "be", "weren't" => "be",
+    "do" => "do", "does" => "do", "did" => "do", "doesn't" => "do", "didn't" => "do", "don't" => "do",
+    "may" => "may", "might" => "may", "mayn't" => "may", "mightn't" => "may",  
+    "can" => "can", "could" => "can", "can't" => "can", "couldn't" => "can",
+    "will" => "will", "would" => "will", "won't" => "will", "wouldn't" => "will",
+    "must" => "must", "mustn't" => "must", 
+
+    "good" => "good", "better" => "good", "best" => "good",
+    "bad" => "bad", "worse" => "bad", "worst" => "bad",
+    "little" => "little", "less" => "little", "least" => "little",
+    # "many" => "many", "more" => "many", "moat" => "many",
+    # "much" => "much", "more" => "much", "most" => "much",
+    "far" => "far", "further" => "far", "furthest" => "far",
+    "farther" => "far", "farthest" => "far",
+    "old" => "old", "elder" => "old", "eldest" => "old",
+    "older" => "older", "oldest" => "old",
+    
+    "a" => "a", "an" => "a",
+
+    # "i" => "one", "you" => "one", "he" => "one", "she" => "one", "it" => "one", "we" => "one", "they" => "one",
+    # "me" => "one", "him" => "one", "us" => "one", "them" => "one",
+    "my" => "one's", "your" => "one's", "his" => "one's", "her" => "one's", "its" => "one's", "our" => "one's", "their" => "one's", 
+    "mine" => "one's", "yours" => "one's", "hers" => "one's", "ours" => "one's", "theirs" => "one's", 
+    "myself" => "oneself", "yourself" => "oneself", "himself" => "oneself", "herself" => "oneself", "itself" => "oneself", "ourselves" => "oneself", "yourselves" => "oneself", "themselves" => "oneself", 
+
+    "belying" => "belie", 
+    "caddying" => "caddie", 
+    "dying" => "die", 
+    "lying" => "lie", 
+    "tying" => "tie", 
+    "underlying" => "underlie", 
+    "untying" => "untie", 
+    "vying" => "vie",
+    "bivouacked" => "bivouac", "bivouacking" => "bivouac",
+    "zincked" => "zinc", "zincking" => "zinc",
+    "frolicked" => "frolic", "frolicking" => "frolic", 
+    "magicked" => "magic", "magicking" => "magic", 
+    "mimicked" => "mimic", "mimicking" => "mimic", 
+    "panicked" => "panic", "panicking" => "panic", 
+    "picnicked" => "picnic", "picnicking" => "picnic", 
+    "trafficked" => "traffic", "trafficking" => "traffic",
+  }
+  
+  ELIMINATE_WORD_LIST = [
+    "be", "been" ,
+    "is" , "are" ,  "am" , "was", "were", "do" , "does", "did" ,
+    "not", "isn't", "aren't", "wasn't", "weren't",  "don't", "doesn't", "didn't",
+    "can" , "could", "can't", "couldn't",
+    "will", "would" , "won't", "wouldn't", 
+    "have", "has", "had" , "haven't", "hasn't", "hadn't",
+    "must", "mustn't", 
+    "shall", "should", "shouldn't",
+    "an" , "a", "the",
+    "i" , "one", "you" , "he" , "she" , "it" , "we" ,  "they" ,
+    "my" , "one's", "your" , "his" , "her" , "its" , "our" , "their" ,  
+    "me" , "him" , "us" , "them" , 
+    "mine" , "yours" , "hers" , "ours" , "theirs" , 
+    "this", "that", "these", "those", "there", 
+    "myself" , "oneself", "yourself" , "himself" , "herself" , "itself" , "ourselves" , "yourselves" , "themselves", 
+    "when", "who", "where", "what", "why", "whom", "how", "whose", "while",
+    "and", "or", "nor", "so", "as", "then", "though", "but", "if", "because", "until", "til", "unless",
+    "at", "by", "in", "on", "near", "to", "from", "down", "off", "through", "out", "past", "up", "of", "for", "with", "like",
+    "about", "along", "below", "during", "above", "among", "across", "around", "beside", "inside", "after", "before", "between", "outside", "against", "behind", "beyond", "over", "under",
+    "into", "upon", "without", "onto", "within"
+  ]
+  
+  C = "[^aiueo]" # consonant
+  V = "[aiueoy]" # vowel
+  CC = "#{C}[^aiueoy]*"
+  VV = "#{V}[aiueo]*"
+  CV = "(#{CC})?#{V}"
+  M = "^(#{CC})?#{VV}#{CC}"
+  
+  def stem_impl(word)
+    return [word]     if word.length < 3 
+    return [word]     unless word =~ /^[\w'-]+$/
+    return [word, $`] if word =~ /'/n
+
+    if word =~ /s$/n
+      return [word, $`+$1]           if word =~ /(ss|sh)es$/n
+      return [word, $`+'y', $`+$1]   if word =~ /(ie)s$/n
+      return [word, $`+$1+$2, $`+$1] if word =~ /(s|z)(e)s$/n
+      return [word, $`+$1, $`+$1+$2] if word =~ /(ch|x|o)(e)s$/n
+      return [word, $`+$1]           if word =~ /([^s])s$/n
+      return [word] 
+    end
+
+    if word =~ /(ed|ing)$/n
+      stem = $`
+      return [word, $`+'y', $`+$1] if word =~ /(ie)d$/n        
+      if word =~ /eed$/n
+        return [word,  word.chop]  if $` =~ /#{M}/o
+      elsif stem =~ /#{CV}/o
+        return [word, stem + 'e']                                         if stem =~ /([^eo]at|bl|v)$/n
+        return (stem.length > 3) ? [word, stem, stem.chop] : [word, stem] if stem =~ /(.)\1$/
+        return [word, stem, stem + 'e']                                   if stem =~ /#{C}#{C}$/o
+        return [word, stem + 'e', stem]
+      end
+    end
+
+    if word =~ /(er|est)$/n
+      stem = $` # `
+      return [word, $` + 'y', $`+$1] if word =~ /(ie)(r|st)$/n        
+      if stem =~ /#{CV}/o
+        return [word, stem + 'e']                                         if stem =~ /([^eo]at|bl|iz|nc|v)$/n 
+        return (stem.length > 3) ? [word, stem, stem.chop] : [word, stem] if stem =~ /(.)\1$/
+        return [word, stem, stem + 'e']                                   if stem =~ /#{C}#{C}$/o
+        return [word, stem + 'e', stem]
+      end
+    end
+    
+    return [word]
+  end
+  
+  def comb(n, m = n)
+    if m == 0
+      yield([])
+    else
+      comb(n, m - 1) do |x|
+        ((x.empty? ? 0 : x.last + 1)...n).each do |i|
+          yield(x+[i])
+        end
+      end
+    end
+  end
+
+  def deploy_by_comb(array_of_word)
+    pool_str = space = ''
+    result = []
+    i = j = array_of_word.size
+    i.times do
+      comb(i,j) do |x|
+        pool_str = space = ''
+        x.each do |y|
+          pool_str << space + array_of_word[y]
+          space = '\s+'
+        end
+        result.push(pool_str)
+      end
+      j -= 1
+    end
+    result
+  end
+
+  def stem(w)
+    word = w.downcase
+    if verb = IRREGULAR_VERB_LIST[word]
+      return (word == verb) ? word : word + '|' + verb
+    end
+    result = or_notation = ''
+    stem_impl(word).each do |x|
+      result << or_notation + x
+      or_notation = '|'
+    end
+    return result
+  end
+
+  def eliminate_word(word_array)
+    word_array - ELIMINATE_WORD_LIST
+  end
+
+  def clear_eliminate_word
+    ELIMINATE_WORD_LIST.clear
+  end
+
+  def add_eliminate_word(word)
+    ELIMINATE_WORD_LIST.push(word) unless ELIMINATE_WORD_LIST.include?(word)
+  end
+  
+  def eliminate_word_list
+    ELIMINATE_WORD_LIST
+  end
+
+end
+
+module Termkey
+  extend self
+
+  KEY_NAME = [
+    TERM_INSERT = "insert",
+    TERM_DELETE = "delete",
+    TERM_HOME   = "home",
+    TERM_END    = "end",
+    TERM_PGUP   = "pgup",
+    TERM_PGDN   = "pgdn",
+    TERM_UP     = "up",
+    TERM_DOWN   = "down",
+    TERM_RIGHT  = "right",
+    TERM_LEFT   = "left",
+    TERM_F1     = "f1",
+    TERM_F2     = "f2",
+    TERM_F3     = "f3",
+    TERM_F4     = "f4",
+    TERM_F5     = "f5",
+    TERM_F6     = "f6",
+    TERM_F7     = "f7",
+    TERM_F8     = "f8",
+    TERM_F9     = "f9",
+    TERM_F10    = "f10",
+    TERM_F11    = "f11",
+    TERM_F12    = "f12",
+  ]
+
+  MOUSE_NAME = [
+    MOUSE_WHEEL_UP    = "wheel_up",
+    MOUSE_WHEEL_DOWN  = "wheel_down"
+  ]
+  KEY_TBL = {}
+  
+  def init_key
+    path=ENV['HOME']+'/.rdic'+RUBY_VERSION[0..-3]+'/'
+    file=ENV['TERM']+'.key'
+    tbl = {}
+    if File.exists? path+file
+      File.open(path+file) {|f| tbl=Marshal.load(f)}
+      KEY_TBL.clear
+      tbl.each{|k,v| KEY_TBL[k] = v}
+    else
+      print "#{ENV['TERM']}用 key情報を作成します。\n"
+      learn_key()
+    end
+  end
+  
+  def learn_key
+    set_key_tbl()
+    begin
+      print "表示されるキー名に対応するキーを押下後、enterを押してください\n"
+      KEY_NAME.each {|x| print x,': '; KEY_TBL[gets.chomp]=x }
+      print "表示されるマウスアクションに対応するマウス操作後、enterを押してください\n"
+      print "(反応がない場合は、そのままenterを押してください；-)\n"
+      MOUSE_NAME.each {|x| print x,': '; KEY_TBL[gets.chomp]=x }
+      begin
+        print "よろしいですか ? [y/n]: "
+        yn=gets
+      end until yn =~ /^(y|n)$/i
+    end until yn =~ /^y$/i
+    
+    (32..255).each {|x| KEY_TBL[x.chr]=x.chr} # these keys are notify translated
+    (0..255).each do |x|      
+      mk="\e"+x.chr # metakey codes
+      unless (KEY_TBL.detect{|k,v| k.index(mk) == 0} or x==27)
+        KEY_TBL[mk]='M-'+KEY_TBL[x.chr]
+      end
+    end
+    (32..255).each {|x| KEY_TBL.delete(x.chr)} # these keys are not translated
+    KEY_TBL[127.chr]  = "delete"
+    
+    path=ENV['HOME']+'/.rdic'+RUBY_VERSION[0..-3]+'/'
+    file=ENV['TERM']+'.key'
+    Dir.mkdir(path) unless begin
+                             st=File.stat path
+                             st.directory?
+                           rescue
+                             false
+                           end
+    begin
+      print "key情報を #{path+file} に出力します。よろしいですか ? [y/n]: "
+      yn=gets
+    end until yn =~ /^(y|n)$/i
+    File.open(path+file, "w+") {|f|
+      Marshal.dump(KEY_TBL, f)
+    } if yn =~ /^y$/i
+    GC.start
+  rescue
+    print $!
+    print "Warning! Cannot store keys in #{path+file}\n"
+    sleep 4
+  end
+  
+  def set_key_tbl
+    KEY_TBL[0.chr]  = "C-@"
+    (1..26).each {|x| KEY_TBL[x.chr] = "C-"+(x+?a-1).chr}
+    KEY_TBL[27.chr] = "escape"
+    KEY_TBL[28.chr] = "C-\\"
+    KEY_TBL[29.chr] = "C-]"
+    KEY_TBL[30.chr] = "C-^"
+    KEY_TBL[31.chr] = "C-_"
+    KEY_TBL["\b"]   = "backspace"
+    # KEY_TBL["\n"]   = "enter" ---> C-m
+    KEY_TBL["\r"]   = "enter"
+    # KEY_TBL["\a"]   = "bell" ---> C-g
+    # KEY_TBL["\t"]   = "tab"  ---> C-i
+  end
+
+  def keymatch?(c)
+    return KEY_TBL.has_key?(c)
+  end
+  
+  def valuematch?(v)
+    return KEY_TBL.has_value?(v)
+  end
+  
+  def keyname(c)
+    return KEY_TBL[c]
+  end
+
+end
+
+module Slice
+  extend self
+
+  CAN_SLICE = {
+    :ASCII        => true,
+    :SPACE        => true, 
+    :KANJI_FIRST  => false, 
+    :KANJI_SECOND => true,
+    :UNPRINT_CHR  => true
+  } 
+  
+  KINSOKU1_1 = /[\)\]\?]/                 # 禁則行頭 シングル 
+  KINSOKU1_2 = /[、。》）】］〕」]/       # 禁則行頭 ダブル
+  KINSOKU2 = /[【◆●《〔（「]/           # 禁則行末 ダブル
+    
+  def char_type?(str,cursor)
+    if (32..126).include?(str[cursor])
+      case str[cursor]
+      when ' '[0]
+        return :SPACE
+      else
+        return :ASCII
+      end
+    end
+    i = 0
+    str.scan(/./).each {|w| 
+      i += w.length
+      break if i >= cursor
+    }
+    return (i == cursor) ? :KANJI_FIRST : :KANJI_SECOND
+  end
+
+  def can_slice?(str,cursor)
+    # can cursorの右で slice ?
+    return CAN_SLICE[char_type?(str, cursor)]
+  end
+  
+  def non_fold_line!(line, col)
+    return (can_slice?(line, col-1)) ? line.slice!(0,col) : line.slice!(0,col-1)
+  end
+  
+  def slice_line!(line, col)  # col : start from 1
+    return line.slice!(0,col) if line.length <= col
+    return (slice_line = slice_line_impl!(line,col)) ? slice_line : non_fold_line!(line,col)
+  end
+  
+  def slice_line_impl!(line, col)
+    allow_size = (RdicMain::indent < 5) ? 5 : RdicMain::indent
+    return nil if col <= allow_size
+    case char_type?(line, col-1)
+    when :KANJI_FIRST
+      return slice_line_impl!(line, col-1)
+    when :KANJI_SECOND
+      return slice_line_impl!(line, col-1) if (line[col-2,2] =~ KINSOKU2)
+      return slice_line_impl!(line, col-1) if (line[col,2] =~ KINSOKU1_2)
+      return slice_line_impl!(line, col-1) if (line[col,1] =~ KINSOKU1_1)
+      return line.slice!(0,col)
+    when :ASCII
+      return line.slice!(0, col) if (line[col,2] =~ KINSOKU2)
+      return slice_line_impl!(line, col-1)
+    else
+      return line.slice!(0,col)
+    end
+  end
+  
+  def slice_line_ix_count(line, col, example=true)
+    ary = line.split("\t")
+    slice_cnt=0
+    indent = ((col-1) > RdicMain::indent) ? ' ' * RdicMain::indent : ''
+    ary.each{|dup_line|
+      unless example
+        next if dup_line =~ RdicMain::example
+      end
+      j = 0
+      list_regexp_indent = ''
+      until (dup_line.empty?)
+        if not slice_cnt == 0
+          if j == 0
+            if dup_line =~ RdicMain::list_regexp
+              list_regexp_indent = ' ' * $&.length
+            end
+            dup_line = indent + dup_line
+          else
+            if (RdicMain::indent + list_regexp_indent.length) < (col / 2)
+              dup_line = indent + list_regexp_indent + dup_line
+            else
+              dup_line = indent + dup_line
+            end
+          end
+        end
+        slice_line!(dup_line, col)
+        slice_cnt += 1
+      end
+    }
+    return slice_cnt
+  end
+  
+  def slice_line_each(line_info, col, example=true)
+    line = line_info[0]
+    match_offset = line_info[1]
+    m = n = 0
+    ary = line.split("\t")
+    slice_cnt = start_col = 0
+    indent = ((col-1) > RdicMain::indent) ? ' ' * RdicMain::indent : ''
+    ary.each{|dup_line|
+      if match_offset == nil
+        match_offset_result = nil
+      else
+        if start_col == 0
+          m,n = match_offset
+        end
+      end
+      
+      unless example
+        if dup_line =~ RdicMain::example
+          start_col += dup_line.length
+          next
+        end
+      end
+      i = 0
+      list_regexp_indent = ''
+      until (dup_line.empty?)
+        if slice_cnt == 0         # 見出し行
+          indent_length = 0
+        else
+          if i == 0               # tab 分割先頭行
+            list_regexp_indent = ' ' * $&.length if dup_line =~ RdicMain::list_regexp
+            dup_line = indent + dup_line
+            indent_length = indent.length
+          else
+            if (RdicMain::indent + list_regexp_indent.length) < (col / 2)
+              dup_line = indent + list_regexp_indent + dup_line
+              indent_length = indent.length + list_regexp_indent.length
+            else
+              dup_line = indent + dup_line
+              indent_length = indent.length
+            end
+          end
+        end
+        slice_line = slice_line!(dup_line, col)
+        
+        if match_offset == nil
+          match_offset_result = nil
+        else
+          if start_col == 0
+            m,n = match_offset
+          elsif start_col >= n
+            ;
+          elsif start_col > m
+            n += indent_length
+          else
+            m += indent_length
+            n += indent_length
+          end
+          match_offset_result = [m,n]
+        end
+        
+        yield slice_line, slice_cnt , start_col, indent_length, match_offset_result
+        start_col += slice_line.length
+        i =+ 1
+        slice_cnt += 1
+      end
+    }
+  end
+
+  def slice_line_reverse_each(line, col, example=true)
+    ary = []
+    slice_line_each(line, col, example) {|slice_line, slice_num, start_col, indent_length, match_offset|
+      ary.push([slice_line, slice_num, start_col, indent_length, match_offset])
+    }
+    ary.reverse_each { |slice_line, slice_num, start_col, indent_length, match_offset| 
+      yield slice_line, slice_num, start_col, indent_length, match_offset
+    }
+  end
+
+end
+
+module RdicKey
+  extend self
+
+  include Termkey
+
+  SORTED_KEY_DESC = [
+    ["help_menu"     , "ヘルプメニュー"],
+    ["right"         , "カーソルを右へ"],
+    ["left"          , "カーソルを左に"],
+    ["movetoeol"     , "カーソルを末尾へ  "],
+    ["movetosol"     , "カーソルを先頭に"],
+    ["prev_page"     , "前のページ"],
+    ["next_page"     , "次のページ"],
+    ["prev_word"     , "前の単語を先頭に"],
+    ["next_word"     , "次の単語を先頭に"],
+    ["prev_line"     , "前の行"],
+    ["next_line"     , "次の行"],
+    ["redraw"        , "再表示"],
+    ["upcase"        , "小文字を大文字に"],
+    ["downcase"      , "大文字を小文字に"],
+    ["capitalize"    , "先頭文字を大文字に残りを小文字に"],
+    ["delete"        , "カーソル上の文字削除"],
+    ["backspace"     , "カーソル前の文字削除"],
+    ["erase"         , "全文字削除"],
+    ["killtoeol"     , "カーソル以降の全文字削除"],
+    ["switch_insert"          , "挿入/上書スイッチ"],
+    ["switch_example_display" , "用例表示のon/off"],
+    ["switch_case"            , "大文字/小文字検索の区別スイッチ"],
+    ["switch_grep"            , "正規表現検索スイッチ"],
+    ["switch_set_pane"        , "辞書選択パネルへ"],
+    ["switch_historypane"     , "history表示パネルへ "],
+    ["switch_fuzzypane"       , "あいまい検索ワード表示パネルへ"],
+    ["search_start"       , "検索開始"],
+    ["fuzzy_search_start" , "連語あいまい検索開始"],
+    ["prev_history"  , "前のhistoryを表示"],
+    ["next_history"  , "次のhistoryを表示"],
+    ["prev_history_search_start" , "前のhistoryの検索開始"],
+    ["next_history_search_start" , "次のhistoryの検索開始"],
+    ["next_fuzzy"    , "連語あいまい検索時に対象語を右シフト"],
+    ["prev_fuzzy"    , "連語あいまい検索時に対象語を左シフト"],
+    ["say_top_word"  , "先頭の見出し語を読み上げ"],
+    ["say_input_word", "入力を読み上げ"],
+    ["push_history"  , "historyに先頭見出し語を登録"],
+    ["quit"          , "終了"]
+  ]
+
+  DEFAULT_KEY_BIND = {
+    "f1"  => "help_menu",
+    "C-a" => "movetosol",
+    "C-b" => "left",
+    "C-c" => "capitalize",
+    "C-d" => "delete",
+    "C-e" => "movetoeol",
+    "C-f" => "right",
+    "C-i" => "switch_case",
+    "C-k" => "killtoeol",
+    "C-l" => "downcase",
+    "C-n" => "next_word",
+    "C-o" => "switch_example_display",
+    "C-p" => "prev_word",
+    "C-q" => "quit",
+    "C-r" => "redraw",
+    "C-u" => "upcase",
+    "C-x" => "switch_grep",
+    "C-j" => "switch_set_pane",
+    "C-t" => "switch_historypane",
+    "M-t" => "push_history",
+    "C-z" => "switch_fuzzypane",
+    "C-v" => "say_top_word",
+    "M-v" => "say_input_word",
+    "enter"  => "search_start",
+    "M-enter"  => "fuzzy_search_start",
+    "backspace" => "backspace",
+    "escape"   => "erase",
+    TERM_INSERT => "switch_insert",
+    TERM_DELETE => "delete",
+    TERM_HOME   => "movetosol",
+    TERM_END    => "movetoeol",
+    TERM_PGUP   => "prev_page",
+    TERM_PGDN   => "next_page",
+    TERM_UP     => "prev_line",
+    TERM_DOWN   => "next_line",
+    TERM_RIGHT  => "right",
+    TERM_LEFT   => "left",
+    MOUSE_WHEEL_UP     => "prev_line",
+    MOUSE_WHEEL_DOWN   => "next_line",
+    "M-c" => "capitalize",
+    "M-l" => "downcase",
+    "M-u" => "upcase",
+    "M--" => "prev_history",
+    "M-+" => "next_history",
+    "M-." => "next_fuzzy",
+    "M-," => "prev_fuzzy",
+    "M-C-n" => "next_history_search_start",
+    "M-C-p" => "prev_history_search_start"
+  }
+  
+  def key_bind(key)
+    return DEFAULT_KEY_BIND[key]
+  end
+
+  def help_each_pairx
+    SORTED_KEY_DESC.each {|func, desc|
+      key = []
+      DEFAULT_KEY_BIND.each_pair {|k, v|
+        key << k if func == v
+      }
+      yield key.sort, func, desc if key.size > 0
+    }
+  end
+      
+  def valid_function?(function)
+    RdicViewControll.public_instance_methods(true).include?(function)
+  end
+  
+  def add_keybind(key,function)
+    unless RdicViewControll.public_instance_methods(true).include?(function)
+      raise "method name '#{function}' is invalid."
+    end
+    DEFAULT_KEY_BIND[key] = function
+  end
+  
+  def delete_keybind(key)
+    DEFAULT_KEY_BIND.delete(key)
+  end
+
+end
+
+module RdicViewCommon 
+
+  def allow_size?
+    return (Curses.cols < 5 or Curses.lines < 3) ? false : true
+  end
+
+  def delegete_to_ctl(method_name,input_chr = nil)
+    if @ctl.class == Array
+      @ctl.each{|ctl|
+        if ctl.public_methods().include?(method_name)
+          if input_chr
+            ctl.method(method_name).call(input_chr)
+          else
+            ctl.method(method_name).call 
+          end
+          
+          break
+
+        end
+      }
+    else
+      if @ctl.public_methods().include?(method_name)
+        if input_chr
+          @ctl.method(method_name).call(input_chr)
+        else
+          @ctl.method(method_name).call 
+        end
+      end
+    end
+  end
+
+  def keybind(key)
+    return nil unless allow_size?
+    function = ""
+    if @ctl.class == Array
+      @ctl.each{|obj| 
+        function = key_bind(key, obj)
+        break if function != nil
+      }
+    else
+      function = key_bind(key, @ctl)
+    end
+    return function
+  end
+  
+  def key_bind(key, obj)
+    if not (function = obj.default_key_bind[key])
+      if (function = RdicKey.key_bind(key))
+        function = nil unless obj.public_methods().include?(function)
+      end
+    end
+    return function
+  end
+  
+  def quit
+    RdicMain::quit()
+  end
+  
+# end
+  
+# module HelpMenuCommon
+
+  def help_each_pair_each(obj_ary)
+    if obj_ary.class == Array
+      obj_ary.each{|obj|
+        obj.help_each_pair() {|key, func, desc| yield key, func, desc  }
+      }
+    else
+      obj_ary.help_each_pair() {|key, func, desc| yield key, func, desc  }
+    end
+  end
+
+  def help_each_pair
+    sorted_key_desc.each {|func, desc|
+      key = []
+      default_key_bind.each_pair {|k, v| 
+        if func == v
+          key << k
+        end
+      }
+      yield key.sort, func, desc unless key.empty?
+    }
+    RdicKey.help_each_pairx{|key, func, desc|
+      if public_methods().include?(func)
+        func2, desc2 = sorted_key_desc.find{|func1, desc1|
+          func == func1
+        }
+        desc2 ||= desc
+        key2 = []
+        key.each {|key1| key2 << key1 unless default_key_bind[key1]}
+        yield key2, func, desc2 unless key2.empty?
+      end
+    }
+  end
+
+  def help_menu
+    container = []
+    keyary = []
+    help_each_pair_each(@ctl) {|key, func, desc| 
+      if (keyary.flatten & key).empty?
+        container.push([key, desc, func]) 
+        keyary.push(key)
+      end
+    }
+    RdicHelpPane.new(nil, container, 0,0,0,0)
+  end
+
+  def command_exec(command)
+    success = system(command)
+    unless success
+      prompt = command + "\tis failure.\t[OK]"
+      RdicMessageBox.new(nil,[:center, :center],prompt,['y','n'],'n','n').execute()
+    end
+    #require "open3"
+    #i, o, e = Open3.popen3(command)
+    #if IO.select([i,o,e],[],[],0.1)
+    #  prompt = ""
+    #  while(line = e.gets)
+    #    prompt << line.chomp + "\t"
+    #  end
+    #  unless prompt.empty?
+    #    prompt << "[OK]" unless prompt.empty?
+    #    RdicMessageBox.new(nil,[:center, :center],prompt,['y','n'],'n','n').execute()
+    #  end
+    #end
+  end
+
+end
+
+class DictionaryMgr
+  
+  require 'singleton'
+  include Singleton
+  
+  @@rdics = {}
+  @@file_name = [] 
+  @@rdic_is_selected = {} 
+  @@dictionary_total_length = 0
+  
+  public
+  def add_dictionary(filename, dictionary)
+    @@file_name.push(filename)
+    @@rdics[filename] = dictionary
+    @@rdic_is_selected[filename] = true
+    @@dictionary_total_length += dictionary.dictionary_length
+  end
+
+  public
+  def filename_each()
+    @@file_name.each {|name|
+      is_selected = @@rdic_is_selected[name]
+      yield [name, is_selected]
+        # yield name, is_selected
+    }
+  end
+
+  public
+  def update_rdic_selected(filename, is_selected)
+    @@rdic_is_selected[filename] = is_selected
+    @@dictionary_total_length = 0
+    selected_dic_each {|dic| @@dictionary_total_length += dic.dictionary_length }
+  end
+  
+  public
+  def lookup_incremental_each(word, case_sense=false)
+    selected_dic_each {|dic|
+      dic.lookup_incremental_each(word,case_sense) {|line| yield line }
+    }
+  end
+  
+  public
+  def lookup_complete_match_each(word, case_sense=false)
+    selected_dic_each {|dic|
+      dic.lookup_complete_match_each(word, case_sense) {|line| yield line } 
+    }
+  end
+
+  public
+  def lookup_complete_match_with_regexp_each(word, reg_ary, case_sense=false)
+    selected_dic_each {|dic| 
+      dic.lookup_complete_match_with_regexp_each(word, reg_ary, case_sense) {|line| yield line }
+    }
+  end
+
+  public
+  def grep_each(reg)
+    selected_dic_each {|dic| dic.grep_each(reg) {|line| yield line } }
+  end
+
+  public
+  def grep_progress_percent
+    return 100.00 if @@dictionary_total_length == 0
+    numerator = 0
+    selected_dic_each {|dic| 
+      numerator += dic.cur_grep_point 
+      break if dic.cur_grep_point != dic.dictionary_length
+    }
+    return percent = numerator.to_f / @@dictionary_total_length.to_f * 100.00
+  end
+
+  private
+  def selected_dic_each
+    @@file_name.each {|filename| yield @@rdics[filename] if @@rdic_is_selected[filename] }
+  end
+end
+
+class MmapDictionary
+
+  require 'mmap'
+
+  AVG_WORD_LENGTH = 50
+  AVG_LINE_LENGTH = 500
+  SKIP_COLS = AVG_LINE_LENGTH # / 2 
+  LOOK_ALLOC_LENGTH = AVG_LINE_LENGTH * 50 
+  GREP_ALLOC_LENGTH = AVG_LINE_LENGTH * 1000
+  GREP_GC_PAR_COUNT = 5
+  LF = "\n"
+
+  attr_reader :dictionary_length, :cur_grep_point
+  
+  def initialize(dicfile, prefix, sep)
+    @dicfile = dicfile
+    @is_open = false
+    open()
+    @prefix = prefix
+    @separator = sep
+    @separator_length = @separator.length
+    @dictionary_length = @dictionary.length
+    @case_sensitive = false
+    @cur_grep_point = 0
+  end
+
+  private
+  def open
+    unless @is_open
+      @dictionary = Mmap.new(@dicfile, "r", Mmap::MAP_SHARED)
+      @is_open = true
+    end
+  end
+  
+  private
+  def close
+    if @is_open
+      @dictionary.munmap
+      @dictionary = nil
+      @is_open = false
+    end
+  end
+  
+  private
+  def gc
+    close()
+    GC.start
+    open()
+  end
+  
+  public 
+  def lookup_complete_match_with_regexp_each(word, reg_ary, case_sense=false)
+    @case_sensitive = case_sense
+    look_each(word, reg_ary) {|line| yield line}
+  end
+  
+  public
+  def lookup_complete_match_each(word, case_sense=false)
+    @case_sensitive = case_sense
+    look_each(word, ['']) {|line| yield line}
+  end
+
+  public 
+  def lookup_incremental_each(word, case_sense=false)
+    @case_sensitive = case_sense
+    look_each(word) {|line| yield line}
+  end
+  
+  public
+  def grep_each(reg)
+    open()
+    @dictionary.madvise(Mmap::MADV_SEQUENTIAL)
+    grep_match_each(reg) {|line| yield line }
+    close()
+  end
+
+  private
+  def look_each(word, reg_ary=nil)
+    # reg_ary    == nil     : incremental lookup
+    # reg_ary[0] == ''      : complete match
+    # reg_ary[0].length > 0 : complete match & regexp
+    open()
+    @dictionary.madvise(Mmap::MADV_RANDOM)
+    word_with_prefix = @prefix + word
+    @word_length = word_with_prefix.length
+    left = binary_search(word_with_prefix)
+    wk_left = linear_rsearch(left, word_with_prefix)
+    left = (wk_left) ? wk_left : linear_search(left, word_with_prefix, reg_ary)
+    if left
+      @dictionary.madvise(Mmap::MADV_SEQUENTIAL)
+      unless reg_ary
+        head_match_each(left, word_with_prefix) {|line| yield line }
+      else
+        head_match_each_with_reg_ary(left, word_with_prefix, reg_ary) {|line| yield line }
+      end
+    end
+    close()
+  end
+
+  private
+  def skip_past_newline(point)
+    i = nil
+    j = point
+    begin
+      return @dictionary_length if j == @dictionary_length
+      j = @dictionary_length if (j += SKIP_COLS) > @dictionary_length
+    end until (i = @dictionary[point..j].index(LF)) 
+    return i + point + 1
+  end
+  
+  private
+  def skip_prev_newline(point)
+    i = nil
+    j = point
+    begin
+      return 0 if j == 0
+      j = 0 if (j -= SKIP_COLS) < 0
+    end until (i = @dictionary[j...point].rindex(LF)) 
+    return i + j + 1
+  end
+
+  # 辞書側のセパレータまでの単語と比較
+  private
+  def compare_accordance_with_dictionary_word(word_upper, start_point)
+    alloc_len = AVG_WORD_LENGTH
+    while ((start_point + alloc_len) < @dictionary_length)
+      break if (separator_point = @dictionary[start_point, alloc_len].index(@separator))
+      alloc_len += AVG_WORD_LENGTH
+    end
+    separator_point = AVG_WORD_LENGTH unless separator_point
+    word_upper <=> @dictionary[start_point, separator_point].upcase()
+  end   
+
+  # 調べる単語の桁数に合わせて比較
+  private
+  def compare_accordance_with_lookup_word(word_upper, start_point)
+    unless (separator_point = @dictionary[start_point, @word_length + @separator_length].index(@separator))
+      word_upper <=> @dictionary[start_point, @word_length].upcase()
+    else
+      word_upper <=> @dictionary[start_point, separator_point].upcase()
+    end
+  end   
+  
+  # 調べる単語にseparatorとか " " を付けて比較 少しでも速く
+  private
+  def compare_accordance_with_lookup_word_with_separator(word_upper, start_point, plus)
+    word_upper + plus <=> @dictionary[start_point, @word_length + plus.length].upcase()
+  end   
+  
+  private
+  def binary_search(word)
+    word_upper = word.upcase
+    left = 0
+    right = @dictionary_length
+    middle = left + ((right - left) / 2)
+    middle = skip_past_newline(middle)
+    while(middle < right && right > left)
+      if compare_accordance_with_dictionary_word(word_upper, middle) > 0
+        left = middle
+      else
+        right = middle
+      end
+      middle = left + ((right - left) / 2)
+      middle = skip_past_newline(middle)
+    end
+    return left
+  end
+
+  private
+  def linear_search(left, word, reg_ary)
+    word_upper = word.upcase
+    loop {
+      case if reg_ary == nil 
+             compare_accordance_with_lookup_word(word_upper, left)
+           elsif reg_ary[0].empty?
+             compare_accordance_with_lookup_word_with_separator(word_upper, left, @separator)
+           else
+             if @separator[0] == ?\s
+               compare_accordance_with_lookup_word_with_separator(word_upper, left, ' ')
+             else
+               compare_accordance_with_lookup_word(word_upper, left)
+             end
+           end
+      when 0
+        return left
+      when -1
+        return nil
+      else
+        left = skip_past_newline(left)
+        return nil if left == @dictionary_length
+      end
+    }
+  end
+  
+  private
+  def linear_rsearch(left, word)
+    word_upper = word.upcase
+    left_save = nil
+    loop {
+      case (compare_accordance_with_lookup_word(word_upper, left))
+      when 0
+        left_save = left
+        return left_save if left == 0
+        left = skip_prev_newline(left)
+      when 1
+        return left_save
+      else
+        return nil if left == 0
+        left = skip_prev_newline(left)
+      end
+    }
+  end
+
+  private
+  def head_match_each(start_point, word)
+    begin
+      reg = Regexp.escape(word)
+      reg1 = Regexp.new('^'+reg,Regexp::IGNORECASE)
+      reg2 = Regexp.new('^'+reg)
+      alloc_len = LOOK_ALLOC_LENGTH
+      catch :stoploop do
+        loop {
+          until ((start_point + alloc_len) >= @dictionary_length)
+            break if @dictionary[start_point,alloc_len].index(LF)
+            alloc_len += AVG_LINE_LENGTH 
+          end  
+          @dictionary[start_point,alloc_len].each { |line|
+            # AVG_LINE_LENGTHによって最後に切られたline　以外
+            if line.index(LF) && line.index(@separator)
+              if reg1 =~ line  
+                start_point += line.length
+                if @case_sensitive
+                  yield line if reg2 =~ line  
+                else
+                  yield line
+                end
+              else
+                throw :stoploop
+              end
+            else
+              if (start_point + line.length) >= @dictionary_length
+                throw :stoploop
+              end
+            end
+          }
+          gc()
+          @dictionary.madvise(Mmap::MADV_SEQUENTIAL)
+          break if start_point >= @dictionary_length
+        }
+      end
+    rescue RegexpError
+      yield "  正規表現に誤りがあります : #{$!}\n"
+    end
+  end
+
+  private
+  def head_match_each_with_reg_ary(start_point, word, reg_ary)
+    begin
+      reg = Regexp.escape(word)+'\s'
+      if @case_sensitive
+        if reg_ary[0].empty?
+          reg1 = Regexp.new('^'+reg.chop+@separator)
+        else
+          reg1 = Regexp.new('^'+reg)
+        end
+      else
+        if reg_ary[0].empty?
+          reg1 = Regexp.new('^'+reg.chop+@separator,Regexp::IGNORECASE)
+        else
+          reg1 = Regexp.new('^'+reg,Regexp::IGNORECASE)
+        end
+      end
+      reg_fuzzy = []
+      reg_ary.each { |f|
+        if f.empty?
+          reg_fuzzy << Regexp.new('^'+reg.chop+@separator,Regexp::IGNORECASE)
+        else
+          reg_fuzzy << Regexp.new('^'+reg+f+@separator,Regexp::IGNORECASE)
+        end
+      }
+      alloc_len = LOOK_ALLOC_LENGTH
+      catch :stoploop do
+        loop {
+          until ((start_point + alloc_len) >= @dictionary_length)
+            break if @dictionary[start_point,alloc_len].index(LF)
+            alloc_len += AVG_LINE_LENGTH 
+          end  
+          @dictionary[start_point,alloc_len].each { |line|
+            # AVG_LINE_LENGTHによって最後に切られたline　以外
+            if line.index(LF) && line.index(@separator)
+              if reg1 =~ line  
+                start_point += line.length
+                reg_fuzzy.each { |r|
+                  if r =~ line
+                    yield line 
+                    break
+                  end
+                }
+              else
+                throw :stoploop
+              end
+            else
+              throw :stoploop if (start_point + line.length) >= @dictionary_length
+            end
+          }
+          gc()
+          @dictionary.madvise(Mmap::MADV_SEQUENTIAL)
+          break if start_point >= @dictionary_length
+        }
+      end
+    rescue RegexpError
+      yield "  正規表現に誤りがあります : #{$!}\n"
+    end
+  end
+    
+  private
+  def grep_match_each(reg)
+    @cur_grep_point = 0
+    gc_control = 1
+    loop {
+      if i = @dictionary[@cur_grep_point, GREP_ALLOC_LENGTH].rindex(LF)
+        i += 1
+        if reg =~ @dictionary[@cur_grep_point, i]
+          @dictionary[@cur_grep_point, i].each_line { |line|
+            @cur_grep_point += line.length
+            yield line if reg =~ line
+          }
+        else
+          @cur_grep_point += i 
+        end
+        if ((gc_control += 1) % GREP_GC_PAR_COUNT) == 0
+          gc()
+          @dictionary.madvise(Mmap::MADV_SEQUENTIAL)
+        end
+      else
+        break
+      end
+    }
+    gc()
+    @cur_grep_point = @dictionary_length
+  end
+ 
+end
+
+class RdicModel
+
+  require 'observer'
+  include Observable
+
+  attr_reader :example_display # 用例表示
+
+  def initialize
+    @words = []
+    @top = 0
+    @top_div = 0
+    @bottom = 0
+    @bottom_div = 0
+    @example_display = true
+    @paint_queue = []
+  end
+
+  def notify()
+    changed()
+    notify_observers()
+  end
+
+  def paint_queue_each
+    @paint_queue.each {|line| yield line}
+  end
+  
+  def paint_queue_shift
+    @paint_queue.shift
+  end
+  
+  def push(word, match_offset=nil)
+    @words.push([word,match_offset])
+  end
+
+  def clear
+    @words.clear unless @words.empty?
+    GC.start
+    @top = 0
+    @top_div = 0
+    @bottom = 0
+    @bottom_div = 0
+  end
+  
+  def length
+    @words.length
+  end
+  
+  def switch_example_display
+    @example_display = (@example_display) ? false : true
+  end
+
+  def first_page(cols, paint_lines)
+    next_push(cols, paint_lines, 0, -1)
+  end
+
+  def current_page(cols, paint_lines)
+    next_push(cols, paint_lines, @top, @top_div - 1)
+  end
+  
+  def next_line(cols, paint_lines)
+    next_push(cols, paint_lines, @top, @top_div)
+  end
+
+  def next_word(cols, paint_lines)
+    if @words.length >= (i = @top + 1) 
+      next_push(cols, paint_lines, i, -1)
+    end
+  end
+
+  def next_page(cols, paint_lines)
+    next_push(cols, paint_lines, @bottom, @bottom_div)
+  end
+  
+  def next_push(cols, paint_lines, from, from_div)
+    i = 0
+    @paint_queue.clear unless @paint_queue.empty?
+    @words[from..@words.length].each_index {|index|
+      cur_index = from + index
+      Slice.slice_line_each(@words[cur_index], cols-1, @example_display) {
+        |slice_line, slice_num, start_col, indent_length, match_offset|
+        next if cur_index == from && slice_num <= from_div
+        if i == 0
+          @top = cur_index
+          @top_div = slice_num
+        end
+        break if (i+=1) > paint_lines
+        @bottom = cur_index
+        @bottom_div = slice_num
+        @paint_queue.push([slice_line, start_col, match_offset, indent_length])
+      }
+      break if i > paint_lines 
+    }
+    notify()
+  end
+  
+  def prev_line(cols, paint_lines)
+    if @top == 0 && @top_div == 0
+      ;
+    elsif @top_div > 0
+      next_push(cols, paint_lines, @top, @top_div - 2)
+    else
+      # １行前の前の行から次の行を表示する
+      next_push(cols, paint_lines, @top-1, Slice.slice_line_ix_count(@words[@top-1][0], cols-1, @example_display)-2)
+    end
+  end
+
+  def prev_word(cols, paint_lines)
+    if @top == 0
+      first_page(cols, paint_lines) if @top_div != 0
+    else
+      next_push(cols, paint_lines, @top-1, -1)
+    end
+  end
+
+  def prev_page(cols, paint_lines)
+    if @top == 0 && @top_div == 0
+      ;
+    else
+      from = @top
+      from_div = @top_div
+      i = 0
+      ary = []
+      cur_index = from
+      @words[0..from].reverse_each {|line|
+        Slice.slice_line_reverse_each(line, cols-1, @example_display) {
+          |slice_line, slice_num, start_col, indent_length, match_offset|
+          next if cur_index == from && slice_num >= from_div
+          if i == 0
+            @bottom = cur_index
+            @bottom_div = slice_num
+          end
+          break if (i+=1) > paint_lines
+          ary.push([slice_line, start_col, match_offset, indent_length])
+          @top = cur_index
+          @top_div = slice_num
+        }
+        break if i > paint_lines 
+        cur_index -= 1
+      }
+      if @top == 0 && ary.length < paint_lines # 前ページが１頁に満たない
+        first_page(cols, paint_lines)
+      else
+        @paint_queue.clear unless @paint_queue.empty?
+        ary.reverse_each {|line_info| @paint_queue.push(line_info) }
+        notify()
+      end
+    end
+  end
+
+end
+
+class RdicHistory
+
+  def initialize(depth, filename)
+    @history_depth = depth
+    @history = Array.new(depth+1)
+    @history_head = 0 
+    @history_pos = 0
+    @last_word = ''
+    @last_force = false
+    @filename = filename
+    get_history_file(filename) if File.exists? filename
+  end
+
+  private
+  def get_history_file(filename)
+    File.open(filename) {|f|
+      f.each_line { |line| push(line.chomp,true) }
+    }
+    GC.start
+  end
+
+  public
+  def save_history_file
+    File.open(@filename, "w+") {|f|
+      from_head_each{|line| f.puts(line) }
+    }
+  end
+
+  public
+  def reset(history)
+    @history = Array.new(@history_depth+1)
+    @history_head = -1 
+    history.each{|item|
+      @history[@history_head += 1] = item
+      @last_word = item
+    }
+    @history_pos = @history_head 
+    @history_head = (@history_head == @history_depth) ? 0 : @history_head + 1
+    @history[@history_head] = nil
+    self
+  end
+
+  # astr = "abc" : bstr = "ab"      return -1 
+  # astr = "abc" : bstr = "abc"     return 0
+  # astr = "abc" : bstr = "abcd"    return 1
+  # astr = "abc" : bstr = "abcde"   return 2
+  # astr = "abc" : bstr = "abcde.." return n 
+  private
+  def head_match?(astr, bstr)
+    return -1 unless astr
+    return -1 unless bstr
+    # thanks kzysさん
+    if bstr =~ /^#{Regexp.escape(astr)}/n
+      return $~.post_match.scan(/./).length
+    end
+    return -1
+  end
+  
+  public
+  def push(str, force=false)
+    return if str.strip.empty?
+    str = str.dup
+    last = (@history_head ==  0) ? @history_depth : @history_head - 1 
+    if head_match?(@history[last], str) == 0 
+      @last_force = force if force
+      return
+    end
+    case
+    when @last_force
+      if head_match?(str, @last_word) == 1
+        @last_word = str
+        @last_force = force
+        return
+      end
+    when force 
+      ;
+    else
+      if head_match?(@history[last], str) == 1 
+        # ひとつ前がkeeで今回がkeepなら、keeをkeepで上書きする
+        @history_head = last
+      elsif head_match?(str, @history[last]) == 1
+        @last_word = str
+        @last_force = force
+        return
+      elsif head_match?(str, @last_word) == 1
+        @last_word = str
+        @last_force = force
+        return
+      end
+    end
+    @history[@history_head] = str
+    @history_pos = @history_head 
+    @history_head = (@history_head == @history_depth) ? 0 : @history_head + 1
+    @history[@history_head] = nil
+    @last_word = str unless force
+    @last_force = force
+  end
+
+  public
+  def next_word()
+    i = (@history_pos < @history_depth) ? @history_pos + 1 : 0
+    if @history[i]
+      @history_pos = i
+      @history[i]
+    else
+      Curses.beep
+      nil
+    end
+  end
+  
+  public
+  def back_word()
+    i = (@history_pos == 0) ? @history_depth : @history_pos -1
+    if @history[i]
+      @history_pos = i
+      @history[i]
+    else
+      Curses.beep
+      nil
+    end
+  end
+  
+  public
+  def from_head_each
+    stop = false
+    i = (@history[@history_head + 1]) ? @history_head + 1 : 0
+    if i == 0
+      @history.each {|l|
+        break if l == nil
+        yield l
+      }
+    else
+      @history[i .. -1].each {|l|
+        if l == nil
+          stop = true
+          break
+        end
+        yield l
+      }
+      unless stop
+        @history[0 ... i].each {|l|
+          break if l == nil
+          yield l
+        }
+      end
+    end
+  end
+
+end
+
+class RdicViewControll
+
+  require 'observer'
+  require 'thread'
+  require 'tempfile'
+  include Observable
+  include RdicViewCommon
+
+  PREREADPAGE = 4 # 先読み頁数
+  IN_PROGRESS = ['/','-','\\','|']
+  MAX_FUZZY_WORD = 5 
+  MAX_FUZZY_WORD_PLUS_1 = MAX_FUZZY_WORD + 1 
+  MAX_FUZZY_DISPLACE = 9999 
+  FUZZY_PLUS_FIRST = '(~ |.?__.? )?(' 
+  FUZZY_PLUS_END = '(, be|, a|, the|, be an?|\?|\.)?' 
+  
+  INSERT = 1
+  OVERWRITE = 2
+  PROMPT = '>'
+  CASE_PROMPT = '='
+  GREP_PROMPT = '~'
+  GREP_CASE_PROMPT = '#'
+  
+  PROMPT01 = "no say_command in config file \t[OK]"
+  PATH = ENV['HOME']+'/.rdic'+RUBY_VERSION[0..-3]+'/'
+
+  SORTED_KEY_DESC = []
+  DEFAULT_KEY_BIND = {}
+
+  def initialize(rdicmgr, history)
+    @rdicmgr = rdicmgr
+    @rdicmodel = RdicModel.new
+    @view = RdicView.new(@rdicmodel)
+    @rdicmodel.add_observer(@view)
+    @lookup_thread = nil
+    @progress_thread = nil
+    @lookup_thread_mutex = Mutex.new
+    @lookup_thread_resource = ConditionVariable.new
+    @ctl = self
+    @last_founded = true
+    @filter_proc = []
+    @grep_mode = false
+    @pre_readlines = 0
+    @pre_next_readlines = 0
+    @line_max = 0
+    @line_cur = 0
+
+    @prompt = PROMPT
+    @last_prompt = PROMPT
+    @mode = INSERT
+    @prompt_length = @prompt.length
+    @word = ''
+    @cursor = @pos = 0
+    @complete_msg = nil
+    @history = history
+    @fuzzy_words = []
+    @fuzzy_pos_ary = []
+  end
+  
+  def switch_set_pane
+    thread_clear()
+    @last_founded = true
+        @rdicsetpane ||= RdicSetPanel.new(@rdicmgr)
+        RdicMain::up_pane(@rdicsetpane, true)
+  end
+  
+  def switch_historypane
+    thread_clear()
+    @last_founded = true
+
+    ary = []
+    @history.from_head_each {|word| ary.push(word) }
+
+    RdicHistoryPanel.new(self, ary.reverse, 0,0,1,0)
+  end
+
+  def sorted_key_desc
+    SORTED_KEY_DESC
+  end
+        
+  def default_key_bind
+    DEFAULT_KEY_BIND
+  end
+
+  def switch_fuzzypane
+    thread_clear()
+    @last_founded = true
+    if @grep_mode
+      @fuzzy_words.clear
+      @fuzzy_pos_ary.clear
+    else
+      @fuzzy_words = @word.scan(/[A-Za-z_\d'-]+|[^\Wa-zA-Z_\dを#{RdicMain::KIGOU}]+/) # '
+      @fuzzy_pos_ary = str_pos_ary(@word)
+    end
+    RdicFuzzyPanel.new(self, @fuzzy_words, 0,0,1,0)
+  end
+
+  def say_input_word
+    return if @word.empty?
+    if RdicMain::say_command.empty?  
+      RdicMessageBox.new(nil,[:center, :center], PROMPT01,['y','n'],'n','n').execute()
+      return
+    end
+    t = Tempfile.new("rdictmp", PATH)
+    t.open
+    t.write(@word)
+    t.close
+    command = format(RdicMain::say_command, t.path) 
+    command_exec(command)
+    redraw()
+ end
+
+  def say_top_word
+    return if @view.first_word.empty?
+    if RdicMain::say_command.empty?  
+      RdicMessageBox.new(nil,[:center, :center], PROMPT01,['y','n'],'n','n').execute()
+      return
+    end
+    t = Tempfile.new("rdictmp", PATH)
+    t.open
+    t.write(@view.first_word)
+    t.close
+    command = format(RdicMain::say_command, t.path) 
+    command_exec(command)
+    redraw()
+  end
+  
+  def switch_grep
+    @grep_mode = (@grep_mode) ? false : true
+    paint_bottom('') unless @grep_mode
+    if @grep_mode
+      RdicMain::block()
+    else
+      RdicMain::non_block()
+    end
+    thread_clear
+    @complete_msg = nil
+    @prompt = case @prompt
+              when PROMPT           then GREP_PROMPT
+              when CASE_PROMPT      then GREP_CASE_PROMPT
+              when GREP_PROMPT      then PROMPT
+              when GREP_CASE_PROMPT then CASE_PROMPT
+              end
+    erase()
+  end
+  
+  def thread_clear()
+    if @progress_thread && @progress_thread.alive?
+      @progress_thread.exit
+      @progress_thread = nil
+    end
+    if @lookup_thread && @lookup_thread.alive?
+     @lookup_thread.exit
+      @lookup_thread = nil
+      GC.start
+    end
+  end
+  
+  def lookup_proc(id)
+    @fuzzy_start_pos = -1
+    @fuzzy_words = []
+    case id
+    when :changed then 
+      if @grep_mode
+        grepup(@word.dup)
+      else
+        lookup(@word.dup)
+      end
+    when :changed_fuzzy
+      lookup_fuzzy()
+    end
+  end
+  
+  def lookup_fuzzy
+    @fuzzy_words = @word.scan(/[A-Za-z_\d'-]+|[^\Wa-zA-Z_\dを#{RdicMain::KIGOU}]+/) # '
+    @fuzzy_pos_ary = str_pos_ary(@word)
+    @lookup_cnt = 0
+    catch :stopfuzzy do
+      unless @fuzzy_words.empty?
+        if @fuzzy_words.size == 1
+          Stem.stem(@fuzzy_words[0]).split('|').each {|word| lookup(word, ['']) }
+        else
+          lookup_fuzzy_impl(@fuzzy_words, MAX_FUZZY_DISPLACE)
+          all_word_lookup(@fuzzy_words)
+        end
+      end
+      RdicMain::put_msg(["incremental_search_start", @word]) if @lookup_cnt == 0
+    end
+  end
+  
+  def next_fuzzy
+    if @fuzzy_start_pos == -1
+      @fuzzy_words = @word.scan(/[A-Za-z_\d'-]+|[^\Wa-zA-Z_\dを#{RdicMain::KIGOU}]+/) # '
+    end
+    @fuzzy_pos_ary = str_pos_ary(@word)
+    if @fuzzy_words.size > @fuzzy_start_pos + 1 
+      @lookup_cnt = 0
+      @fuzzy_start_pos+=1
+      lookup_shift_fuzzy(@fuzzy_start_pos)
+      set_fuzzy_cursor(@fuzzy_pos_ary, @fuzzy_start_pos)
+    end
+  end
+
+  def prev_fuzzy
+    if @fuzzy_start_pos > 0
+      @lookup_cnt = 0
+      @fuzzy_start_pos-=1
+      set_fuzzy_cursor(@fuzzy_pos_ary, @fuzzy_start_pos)
+      lookup_shift_fuzzy(@fuzzy_start_pos)
+    end
+  end
+  
+  def shift_fuzzy(pos)
+    @lookup_cnt = 0
+    @fuzzy_start_pos = pos
+    set_fuzzy_cursor(@fuzzy_pos_ary, @fuzzy_start_pos)
+    lookup_shift_fuzzy(@fuzzy_start_pos)
+  end
+  
+  def str_pos_ary(word)
+    ary = []
+    i = 0
+    @fuzzy_words.each {|str|
+      ary << (i = word.index(str,i))
+      i += str.length 
+    }
+    ary
+  end
+
+  def lookup_shift_fuzzy(start_pos)
+    words_shift = @fuzzy_words[start_pos, MAX_FUZZY_WORD_PLUS_1]
+    if words_shift
+      lookup_fuzzy_impl(words_shift, 1) if words_shift.size > 1
+      Stem.stem(@fuzzy_words[start_pos]).split('|').each {|word| lookup(word, ['']) }
+      incremental_lookup(@fuzzy_words[start_pos]) if @lookup_cnt == 0
+    end
+  end
+  
+  # 連語検索
+  def lookup_fuzzy_impl(words, max_fuzzy_displace)
+    for i in (0...max_fuzzy_displace)
+      break unless words.size-1 > i 
+      first_stem = Stem.stem(words[i]).split('|')
+      # fuzzy regexp の配列を作る
+      f = words[i+1,MAX_FUZZY_WORD].collect {|x| 
+        FUZZY_PLUS_FIRST + Stem.stem(Regexp.escape(x)) + ')'
+      }
+      # fuzzy regexp の配列を原先生のcombinationで展開する
+      reg_ary = Stem.deploy_by_comb(f).collect {|x| x.concat(FUZZY_PLUS_END)}
+      # fuzzy regexp 付きで lookup
+      first_stem.each {|word| lookup(word, reg_ary) }
+
+      words1,words2,words3 = words[i,3]
+      if words1[0, 1] =~ /[a-zA-Z]/n
+        lookup(words1+'-'+words2, [''])
+        # lookup(words1+    words2, [''])
+        if words3
+          lookup(words1+'-'+words2+'-'+words3, [''])
+          lookup(words1+'-'+words2+' '+words3, [''])
+        end
+      end
+      
+      f = nil
+      reg_ary = nil
+      GC.start  # if (i%20) == 0
+
+      peek_msg() unless max_fuzzy_displace == 1
+    end
+  end
+  
+  def peek_msg
+    method_name, = RdicMain::peek_msg()
+    case method_name
+    when nil, 
+        "prev_page", 
+        "next_page", 
+        "prev_line", 
+        "next_line",
+        "switch_example_display"
+      ;
+    else
+      throw :stopfuzzy
+    end
+  end
+
+  def all_word_lookup(words)
+    ary = []
+    words.each {|word|
+      Stem.stem(word).split('|').each {|w|
+        ary << w 
+      }
+    }
+    Stem.eliminate_word(ary).each {|word| 
+      lookup(word, ['']) 
+    }
+  end
+  
+  def incremental_lookup(word)
+    @last_founded = true
+    str = ''
+    j = 0
+    word.scan(/./).each {|w|
+      str << w
+      lookup(str)
+      j += w.length
+    }
+  end
+
+  def lookup(word, reg_ary=nil)
+    @lookup_cnt = 0 unless reg_ary
+    catch :escape_lookup do
+      look_init(word, reg_ary)
+      oikosi_kinsi = true
+      @lookup_thread = Thread.new {
+        @lookup_thread_mutex.synchronize do
+          oikosi_kinsi = false
+          lookup_thread_impl(word, reg_ary)
+        end
+      }
+      # must wait until lookup_thread move to exit or unlock
+      while(oikosi_kinsi)
+        # 1000 回に 1回くらいのタイミングでここに来る
+        sleep(0.1)
+      end
+      @lookup_thread_mutex.synchronize do
+        look_progress_stop()
+      end
+    end
+  end
+  
+  def look_init(word, reg_ary=nil)
+    unless reg_ary
+      unless @last_founded
+        # 前回見つかってない & 今回の単語 =~ /^前回の単語/
+        # の時は処理しない
+        if (len = @last_word.length) <= word.length
+          if @last_word == word[0,len]
+            @last_word = word
+            throw :escape_lookup  
+          end
+        
+        end
+      end
+    end
+    if @lookup_thread && @lookup_thread.alive?
+      @move_exit = true
+      @lookup_thread_resource.signal
+      @lookup_thread.join
+    else
+      @move_exit = false
+    end
+  end
+  
+  def lookup_thread_impl(word, reg_ary=nil)
+    @last_word = word
+    j = 0
+    pre_readlines_initialize()
+    @last_founded = false if @lookup_cnt == 0
+    @first_page_done = false
+    look_progress_stop()
+    look_progress_start()
+    look_each(word, reg_ary, case_sensitive?) {|line|
+      if (@lookup_cnt += 1) == 1
+        @rdicmodel.clear
+        @last_founded = true
+      end
+      @rdicmodel.push(filter(line.chomp))
+      if (j+=1) > paint_lines()
+        @first_page_done = first_page(@last_founded) unless @first_page_done
+      end
+      if j > @pre_readlines
+        look_progress_stop()
+        if @move_exit # 自らexitしないとGCの対象にならないみたい ruby1.6
+          @move_exit = false
+          Thread.exit
+        end
+        @lookup_thread_resource.wait(@lookup_thread_mutex)
+        if @move_exit
+          @move_exit = false
+          Thread.exit
+        end
+        j = 0
+      end
+    }
+    look_progress_stop()
+    @first_page_done = first_page(@last_founded) unless @first_page_done
+  end
+
+  def look_each(word, reg_ary, case_sense)
+    case reg_ary
+    when nil
+      @rdicmgr.lookup_incremental_each(word,case_sense) {|line| yield line }
+    when ['']
+      @rdicmgr.lookup_complete_match_each(word, case_sense) {|line| yield line }
+    else
+      @rdicmgr.lookup_complete_match_with_regexp_each(word, reg_ary, case_sense) {|line| yield line }
+    end
+  end
+
+  def pre_readlines_initialize
+    @line_max = 0
+    @line_cur = 0
+    readlines = (paint_lines() < 45) ? 45 : paint_lines()
+    @pre_readlines =  PREREADPAGE * readlines
+    @pre_next_readlines = readlines
+  end
+  
+
+  def pre_readlines_initialize_for_grep
+    @line_max = 0
+    @line_cur = 0
+    readlines = (paint_lines() < 45) ? 45 : paint_lines()
+    @pre_readlines = @pre_next_readlines = PREREADPAGE * readlines
+  end
+  
+  def pre_read_control(from)
+    return unless @lookup_thread && @lookup_thread.alive?
+    case from
+    when :next_page
+      @line_cur += paint_lines()
+      if @line_cur > @line_max
+        @line_max += paint_lines()
+        @pre_readlines = @pre_next_readlines
+        @lookup_thread_resource.signal if @lookup_thread && @lookup_thread.alive?
+      end
+    when :next_line, :next_word
+      @line_cur += 1
+      if @line_cur > @line_max
+        @line_max += 1
+        @pre_readlines = 1
+        @lookup_thread_resource.signal if @lookup_thread && @lookup_thread.alive?
+      end
+    when :prev_page
+      @line_cur -= paint_lines() if @line_cur > paint_lines()
+    when :prev_line, :prev_word
+      @line_cur -= 1 if @line_cur > 0
+    end
+  end
+
+  def add_filter_proc(&block)
+    @filter_proc.push(block)
+  end
+
+  def filter(line)
+    @filter_proc.each {|p|line = p.call(line, @grep_mode) }
+    return line
+  end
+  
+  def look_progress_start
+    n = -1
+    @progress_thread = Thread.new {
+      loop {
+        sleep(0.1)
+        paint(IN_PROGRESS[n+=1])
+        n = -1 if n > 2
+      }
+    }
+  end
+  
+  def look_progress_stop
+    if @progress_thread && @progress_thread.alive?
+      @progress_thread.exit
+      @progress_thread.join
+      @progress_thread = nil
+    end
+  end
+  
+  def grepup(word)
+    begin
+      if case_sensitive?
+        reg = Regexp.new(word)
+      else
+        reg = Regexp.new(word, Regexp::IGNORECASE)
+      end
+    rescue RegexpError
+      thread_clear()
+      @rdicmodel.clear
+      RdicMessageBox.new(nil,[:center, :center],"#{$!}\t[OK]",['y','n'],'n','n').execute()
+      return
+    end
+    grep_init()
+    @lookup_thread = Thread.new {
+      @lookup_thread_mutex.synchronize do
+        grepup_thread_impl(reg)
+      end
+    }
+  end
+  
+  def grepup_thread_impl(reg)
+    j = x1 = x2 = y1 = y2 = 0
+    pre_readlines_initialize_for_grep()
+    grep_progress_stop()
+    grep_progress_start()
+    @rdicmgr.grep_each(reg) {|line|
+      if RUBY_VERSION >= '1.8.0'
+        if (m = reg.match(line))
+          x1,y1 = m.offset(0)
+          if x1 == y1
+            offset = nil
+          else
+            # \t は表示上は改行に使用し現れない
+            x2 = x1 - line[0,x1].count("\t")
+            y2 = y1 - line[0...y1].count("\t")
+            offset = [x2, y2]
+          end
+        else
+          offset = nil
+        end
+      else
+        offset = nil
+      end
+      
+      @rdicmodel.push(filter(line.chomp), offset)
+      if (j+=1) > @pre_readlines
+        if @move_exit # 自ら exitしないと GCの対象にならないみたい ruby1.6
+          @move_exit = false
+          Thread.exit
+        end
+        @lookup_thread_resource.wait(@lookup_thread_mutex)
+        if @move_exit
+          @move_exit = false
+          Thread.exit
+        end
+        j = 0
+      end
+    }
+    grep_progress_stop()
+  end
+  
+  def grep_init
+    if @lookup_thread && @lookup_thread.alive?
+      @lookup_thread.exit
+      @lookup_thread.join
+      @lookup_thread = nil
+      GC.start
+    end
+    @move_exit = false
+  end
+  
+  def grep_progress_start
+    @rdicmodel.clear()
+    Curses.clear
+    @view.painted_line = 0
+    last_percent = 0
+    n = -1
+    last_quantity = 0
+    @progress_thread = Thread.new {
+      loop {
+        if @rdicmodel.length != last_quantity
+          redraw() if @view.painted_line < paint_lines()
+          last_quantity = @rdicmodel.length
+        end
+        percent = @rdicmgr.grep_progress_percent()
+        if percent > last_percent
+          paint_bottom(IN_PROGRESS[n+=1] +                 \
+                       sprintf("%3.2f",percent).rjust(7) + \
+                       "% : hit counts "+@rdicmodel.length.to_s)
+        else
+          paint_bottom('*' + sprintf("%3.2f",percent).rjust(7) + \
+                       "% : hit counts "+ @rdicmodel.length.to_s)
+        end
+        n = -1 if n > 2
+        last_percent = percent
+        sleep(0.3)
+      }
+    }
+  end
+  
+  def grep_progress_stop
+    if @progress_thread && @progress_thread.alive?
+      redraw() if @view.painted_line < paint_lines()
+      if @progress_thread && @progress_thread.alive?
+        @progress_thread.exit
+        @progress_thread.join
+        @progress_thread = nil
+      end
+      if (percent = @rdicmgr.grep_progress_percent()) > 0
+        if percent == 100
+          @complete_msg = "! 100.00%"  + " : hit counts " + @rdicmodel.length.to_s
+          paint_bottom(@complete_msg)
+        else
+          paint_bottom('*' + sprintf("%3.2f",percent).rjust(7) + \
+                       "% : hit counts "+ @rdicmodel.length.to_s)
+        end
+      else
+        paint()
+      end
+    end
+  end
+  
+  def lines
+    return Curses.lines
+  end
+  
+  def paint_lines
+    return (@grep_mode) ? lines-2 : lines-1
+  end
+  
+  def cols
+    return Curses.cols
+  end
+
+  def allow_size?
+    return ((Curses.cols - RdicMain::indent) < 5 or Curses.lines < 2) ? false : true
+  end
+  
+  def first_page(bool)
+    return true unless bool
+    @rdicmodel.first_page(cols, paint_lines())
+    return true
+  end
+
+  def prev_page
+    @rdicmodel.prev_page(cols, paint_lines())
+    pre_read_control(:prev_page)
+  end
+  
+  def next_page
+    @rdicmodel.next_page(cols, paint_lines())
+    pre_read_control(:next_page)
+  end
+  
+  def prev_line
+    @rdicmodel.prev_line(cols, paint_lines())
+    pre_read_control(:prev_line)
+  end
+  
+  def prev_word
+    @rdicmodel.prev_word(cols, paint_lines())
+    pre_read_control(:prev_word)
+  end
+  
+  def next_line
+    @rdicmodel.next_line(cols, paint_lines())
+    pre_read_control(:next_line)
+  end
+
+  def next_word
+    @rdicmodel.next_word(cols, paint_lines())
+    pre_read_control(:next_word)
+  end
+
+  def redraw
+    return unless allow_size?
+    @rdicmodel.current_page(cols, paint_lines())
+  end
+
+  def switch_case
+    @prompt = case @prompt
+              when PROMPT           then CASE_PROMPT
+              when CASE_PROMPT      then PROMPT
+              when GREP_PROMPT      then GREP_CASE_PROMPT
+              when GREP_CASE_PROMPT then GREP_PROMPT
+              end
+    word_changed(0)
+  end
+  
+  def case_sensitive?
+    return case @prompt
+           when PROMPT           then false
+           when CASE_PROMPT      then true
+           when GREP_PROMPT      then false
+           when GREP_CASE_PROMPT then true
+           end
+  end
+  
+  def switch_example_display
+    @rdicmodel.switch_example_display()
+    redraw()
+  end
+  
+  def search_start
+    if @grep_mode
+      return if @word.empty?
+      @complete_msg = nil 
+      @history.push(@word)
+      lookup_proc(:changed)
+    else
+      @history.push(@word)
+      word_changed(0)
+    end
+  end
+
+  def push_history
+    @history.push(@view.first_word, true) unless @grep_mode
+  end
+    
+  def switch_insert
+    case @mode
+    when INSERT    then @mode = OVERWRITE
+    when OVERWRITE then @mode = INSERT
+    end
+  end
+
+  def word_changed(cursor=@cursor)
+    return if @grep_mode
+    return if @word.empty?
+    if cursor < @word.length
+      pre_word = @word
+      pre_cursor = @cursor
+      @word = ''
+      @cursor = 0
+      pre_word.scan(/./).each {|w|
+        @word << w
+        lookup_proc(:changed)
+        @cursor += w.length
+      }
+      @cursor = pre_cursor
+    else
+      lookup_proc(:changed)
+    end
+  end
+
+  def typestring_from_selection(str)
+    return unless allow_size?
+    @word = str
+    @cursor = @word.length 
+    @history.push(@word)
+    fuzzy_search_start() unless @grep_mode
+  end
+  
+  def fuzzy_search_start
+    unless @word.empty?
+      Curses.clear
+      paint('/')
+      lookup_proc(:changed_fuzzy)
+    end
+  end
+  
+  def typestring(c)
+    return unless allow_size?
+    over = (@mode==OVERWRITE) ? 1 : 0
+    get_cursor_from_array()
+    over = Slice.can_slice?(@word, @cursor) ? 1 : 2 if over == 1
+    @word[@cursor, over] = c
+    @cursor += c.length
+    @history.push(@word) unless @grep_mode
+    word_changed()
+  end
+  
+  def incremental_search_start(str)
+    @last_founded = true
+    word_changed(0)
+  end
+
+  def movetosol 
+    @cursor = 0
+  end
+
+  def movetoeol 
+    @cursor = @word.length 
+  end
+  
+  def killtoeol 
+    get_cursor_from_array()
+    @word = @word[0,@cursor]
+    @history.push(@word)
+    word_changed()
+  end
+
+  def right 
+    get_cursor_from_array()
+    if @cursor < @word.length
+      #n = (@word[@cursor,1] =~ /\w/ || @word[@cursor,1] =~ /\W/) ? 1 : 2
+      n = (32..126).include?(@word[@cursor]) ? 1 : 2
+      n.times {@cursor += 1}
+    else
+      Curses.beep
+    end
+  end
+  
+  def left 
+    get_cursor_from_array()
+    if @cursor == 0
+      Curses.beep
+    else
+      #n = (@word[@cursor-1,1] =~ /\w/ || @word[@cursor-1,1] =~ /\W/) ? 1 : 2
+      n = (32..126).include?(@word[@cursor-1]) ? 1 : 2
+      n.times {@cursor -= 1}
+    end
+  end
+  
+  def delete 
+    get_cursor_from_array()
+    if @cursor < @word.length
+      #n = (@word[@cursor,1] =~ /\w/ || @word[@cursor,1] =~ /\W/) ? 1 : 2
+      n = (32..126).include?(@word[@cursor]) ? 1 : 2
+      n.times {@word[@cursor,1] = ''}
+      @history.push(@word)
+      word_changed()
+    else
+      Curses.beep
+    end
+  end
+  
+  def capitalize
+    @word.capitalize!
+    @history.push(@word)
+    word_changed(0)
+  end
+
+  def upcase
+    @word.upcase!
+    @history.push(@word)
+    word_changed(0)
+  end
+
+  def downcase
+    @word.downcase!
+    @history.push(@word)
+    word_changed(0)
+  end
+  
+  def backspace
+    get_cursor_from_array()
+    if @cursor == 0
+      Curses.beep
+    else
+      #n = (@word[@cursor-1,1] =~ /\w/ || @word[@cursor-1,1] =~ /\W/) ? 1 : 2
+      n = (32..126).include?(@word[@cursor-1]) ? 1 : 2
+      n.times {@cursor -= 1; @word[@cursor,1] = ''}
+      @history.push(@word)
+      word_changed()
+    end
+  end
+  
+  def erase
+    @word = ''
+    @cursor = 0
+  end
+
+  def next_history
+    if (s = @history.next_word()) != nil
+      @word = s
+      @cursor = s.length
+    end
+  end
+
+  def next_history_search_start()
+    if (s = @history.next_word()) != nil
+      @word = s
+      @cursor = s.length
+      if @grep_mode
+        lookup_proc(:changed)
+      else
+        lookup_proc(:changed_fuzzy)
+      end
+    end
+  end
+
+  def prev_history
+    if (s = @history.back_word()) != nil
+      @word = s
+      @cursor = s.length
+    end
+  end
+
+  def prev_history_search_start()
+    if (s = @history.back_word()) != nil
+      @word = s
+      @cursor = s.length
+      if @grep_mode
+        lookup_proc(:changed)
+      else
+        lookup_proc(:changed_fuzzy)
+      end
+    end
+  end
+
+  def reset_history(history)
+    @history = @history.reset(history)
+  end
+
+  def get_cursor_from_array
+    @cursor = @cursor[0][@cursor[1]] if @cursor.class == Array
+  end
+
+  def set_fuzzy_cursor(ary, pos)
+    # ary : 連語のwordの先頭位置の配列
+    # pos : fuzzy_shiftで現在差している配列のindex
+    @cursor = [ary, pos]
+  end
+  
+  def paint(prompt=@prompt)
+    paint_complete_msg(@complete_msg) if @complete_msg
+    Curses.setpos 0,0
+    Curses.addstr ' ' * cols
+    Curses.setpos 0,0
+    if @cursor.class == Array
+      Curses.addstr paint_fuzzy_shift(prompt)
+    else
+      Curses.addstr paint_text(prompt)
+    end
+    paint_example()
+    Curses.setpos 0,@prompt_length + @pos
+    Curses.refresh
+  end
+
+  def paint_text(prompt)
+    disp_cols = cols - 2 # 2:日本語入力域の確保
+
+    if (@prompt_length + @cursor) > disp_cols
+      n = @prompt_length + @cursor - disp_cols
+      m = Slice.can_slice?(@word, n-1) ? 0 : 1
+      word = @word[n+m..@cursor-1]
+      @pos = word.length
+      prompt + word
+    elsif (@prompt_length + @word.length) > disp_cols
+      n = disp_cols - @prompt_length
+      m = Slice.can_slice?(@word, n-1) ? 0 : 1
+      @pos = @cursor
+      prompt + @word[0, n-m]
+    else
+      @pos = @cursor
+      prompt + @word
+    end
+  end
+
+  def paint_fuzzy_shift(prompt)
+    disp_cols = cols - 2   # 2:日本語入力域の確保
+    d1 = disp_cols * 2 / 3 # カーソル表示幅
+    d2 = disp_cols / 5     # カーソル前表示幅
+    start_col_ary = []
+    
+    start_col = @cursor[0][0]
+    limit = d1
+    @cursor[0].each{|x|
+      if x >= limit
+        start_col = limit - d2
+        if (x - start_col) > disp_cols
+          start_col = x
+        else
+          start_col = start_col - (Slice.can_slice?(@word, start_col-1) ? 0 : 1)
+        end
+        start_col_ary << start_col
+        limit = start_col + d1
+      else
+        start_col_ary << start_col 
+      end
+    }
+    
+    p = @cursor[1]
+    word = @word[start_col_ary[p]..-1]
+    @pos = @cursor[0][p] - start_col_ary[p]
+    
+    if (@prompt_length + word.length) > disp_cols
+      n = disp_cols - @prompt_length
+      m = Slice.can_slice?(word, n-1) ? 0 : 1
+      prompt + word[0, n-m]
+    else
+      prompt + word
+    end
+  end
+  
+  def paint_example
+    unless @rdicmodel.example_display
+      Curses.setpos 0,cols-1
+      Curses.addstr '-'
+    end
+  end
+  
+  def paint_bottom(msg)
+    Curses.setpos lines-1,0
+    Curses.addstr ' ' * cols
+    Curses.setpos lines-1,0
+    Curses.addstr(msg)
+    paint()
+  end
+  
+  def paint_complete_msg(msg)
+    Curses.setpos lines-1,0
+    Curses.addstr ' ' * cols
+    Curses.setpos lines-1,0
+    Curses.addstr(msg)
+  end
+
+end
+
+class RdicView
+
+  attr_accessor :painted_line
+  attr_reader   :first_word
+
+  def initialize(rdicmodel)
+    @rdicmodel = rdicmodel
+    @painted_line = 0
+    @first_word = ''
+    @separator = RdicMain::separator.reverse.gsub(/^ +/,'').reverse
+  end
+
+  def update
+    paint_view
+  end
+
+  def paint_view
+    @first_word = ''
+    @find_first_word = true
+    @find_second_word = true
+    i = 0
+    while (line_info = @rdicmodel.paint_queue_shift)
+      slice_line, start_col, match_offset, indent_length = line_info
+      if i == 0
+        Curses.clear
+        @painted_line = 0
+        i = 1
+      end
+      Curses.setpos @painted_line+=1, 0
+      if match_offset
+        standout_reg(slice_line, start_col, match_offset, indent_length)
+      elsif start_col == 0
+        if RUBY_VERSION >= '1.8.0'
+          standout_word(slice_line)
+        else
+          non_standout(slice_line)
+        end
+      else
+        if not @find_first_word
+          if RdicMain::reverse
+            standout_word2(slice_line)
+          else
+            non_standout(slice_line)
+          end
+        elsif not @find_second_word
+          if RdicMain::bold
+            standout_word3(slice_line)
+          else
+            non_standout(slice_line)
+          end
+        else
+          Curses.addstr(slice_line)
+        end
+      end
+    end
+    GC.start
+  end
+
+  def non_standout(line)
+    Curses.addstr(line)
+    if line =~ /(^#{RdicMain::prefix})/
+      line = $~.post_match
+    end
+    if line =~ /(^.+?)#{@separator}/
+      @first_word << $1 if @first_word.empty?
+    else
+      @find_first_word = false
+      @first_word = line if @first_word.empty?
+    end
+  end
+    
+  def standout_word(line)
+    if line =~ /(^#{RdicMain::prefix})/
+      Curses.addstr($1)
+      line = $~.post_match
+    end
+    if line =~ /(^.+?)#{@separator}/
+      if @first_word.empty?
+        @first_word << $1
+        if RdicMain::reverse
+          Curses.attron(Curses::A_REVERSE)
+          Curses.addstr($1)
+          Curses.attroff(Curses::A_REVERSE)
+          Curses.addstr(@separator + $~.post_match)
+        elsif RdicMain::bold
+          Curses.attron(Curses::A_BOLD)
+          Curses.addstr($1)
+          Curses.attroff(Curses::A_BOLD)
+          Curses.addstr(@separator + $~.post_match)
+        else
+          Curses.addstr(line)
+        end
+      elsif RdicMain::bold
+        Curses.attron(Curses::A_BOLD)
+        Curses.addstr($1)
+        Curses.attroff(Curses::A_BOLD)
+        Curses.addstr(@separator + $~.post_match)
+      else
+        Curses.addstr(line)
+      end
+    else
+      if @first_word.empty?
+        @find_first_word = false
+        @first_word << line
+        if RdicMain::reverse
+          Curses.attron(Curses::A_REVERSE)
+          Curses.addstr(line)
+          Curses.attroff(Curses::A_REVERSE)
+        elsif RdicMain::bold
+          @find_second_word = false
+          Curses.attron(Curses::A_BOLD)
+          Curses.addstr(line)
+          Curses.attroff(Curses::A_BOLD)
+        else
+          Curses.addstr(line)
+        end
+      elsif RdicMain::bold
+        @find_second_word = false
+        Curses.attron(Curses::A_BOLD)
+        Curses.addstr(line)
+        Curses.attroff(Curses::A_BOLD)
+      else
+        Curses.addstr(line)
+      end
+    end
+  end
+  
+  def standout_word2(line)
+    if line =~ /(^.*?)#{@separator}/
+      @find_first_word = true
+      Curses.attron(Curses::A_REVERSE)
+      Curses.addstr($1)
+      @first_word << $1
+      Curses.attroff(Curses::A_REVERSE)
+      Curses.addstr(' :' + $~.post_match)
+    else
+      Curses.attron(Curses::A_REVERSE)
+      Curses.addstr(line)
+      @first_word << line
+      Curses.attroff(Curses::A_REVERSE)
+    end
+  end
+  
+  def standout_word3(line)
+    if line =~ /(^.*?)#{@separator}/
+      @find_second_word = true
+      Curses.attron(Curses::A_BOLD)
+      Curses.addstr($1)
+      Curses.attroff(Curses::A_BOLD)
+      Curses.addstr(' :' + $~.post_match)
+    else
+      Curses.attron(Curses::A_BOLD)
+      Curses.addstr(line)
+      Curses.attroff(Curses::A_BOLD)
+    end
+  end
+
+  def standout_reg(slice_line, start_col, match_offset, indent_length)
+    slice_offset = [start_col, start_col + slice_line.length]
+    standout_each(match_offset, slice_offset, indent_length) {|x,y,is_match|
+      if is_match
+        Curses.attron(Curses::A_UNDERLINE)
+        Curses.attron(Curses::A_BOLD)
+        Curses.addstr(slice_line.slice!(0..(y-x)))
+        Curses.attroff(Curses::A_UNDERLINE)
+        Curses.attroff(Curses::A_BOLD)
+      else
+        Curses.addstr(slice_line.slice!(0..(y-x)))
+      end
+    }
+  end
+
+  def standout_each(match_offset, slice_offset, indent_length)
+    m,n = match_offset
+    a,b = slice_offset
+    n-=1                                  #    m       n
+    b-=1                                  #    |#######|    
+    if b < m                              # a b
+      yield a,b,false                     # |=|
+    elsif a > n                           #              a b
+      yield a,b,false                     #              |=|
+    elsif a < m and b >= m and b <= n     # a          
+      yield a,m-1,false                   # |=|        b
+      yield m,b,true                      #    |-------|
+    elsif a < m and b > n                 # a             
+      yield a,m-1,false                   # |=| 
+      yield m,n,true                      #    |-------|  b
+      yield n+1,b,false                   #             |=| 
+    elsif a >= m and b <= n               #    a       b
+      if a == 0  || indent_length == 0    #
+        yield a,b,true                    #    |-------| 
+      else                                #
+        yield a,a+indent_length-1,false   #    $$ 
+        yield a+indent_length,b,true      #     |------| 
+      end                                 #
+    else                                  #    a        
+      if a == 0  || indent_length == 0    #
+        yield a,n,true                    #    |-------|  b
+      else                                #
+        yield a,a+indent_length-1,false   #    $$
+        yield a+indent_length,n,true      #     |------|  b
+      end                                 #
+      yield n+1,b,false                   #             |=|
+    end
+  end
+  
+end
+
+class RdicSetPanel
+
+  require "curses"
+  include Curses
+  include RdicViewCommon
+
+  SORTED_KEY_DESC = [
+    ["help_menu" , "ヘルプメニュー"],
+    ["switch_top"  , "キャンセル"],
+    ["move_next_cursor", "次の項目へ"],
+    ["move_prev_cursor", "前の項目へ"],
+    ["prev_word" , "前の行"],
+    ["next_word" , "次の行"],
+    ["search_start", "更新"]
+  ]
+
+  DEFAULT_KEY_BIND = {
+    "f1"    => "help_menu",
+    "C-c"   => "switch_top",
+    "escape"   => "switch_top",
+    "C-b"   => "switch_top",
+    "tab"   => "move_next_cursor",
+    "C-i"   => "move_next_cursor",
+    "C-u"   => "move_prev_cursor"
+  }
+
+  X_YES  = 39
+  X_NO   = 46
+  X_OK   = 36
+  CENTER = 35
+  
+  TITTLE         = "               Option Setting Panel"
+  VERSION        = "           rdic version #{RDIC_VERSION}"
+  SUB_TITTLE_01  = " 辞書選択"
+  FILENAME_PROMT = ["    %-30s YES(%s)  NO(%s)", X_YES, X_NO]
+  OK_PROMPT      = [" "*35+"[OK]",X_OK]
+
+  TYPE_YES = 0
+  TYPE_NO  = 1
+  TYPE_OK  = 2
+  
+  def initialize(rdicmgr)
+    @rdicmgr = rdicmgr
+    @win = Window.new(0, 0, 0, 0)
+    @ctl = self
+    @first_disp = true
+        # RdicMain::up_pane(self, true)
+  end
+
+  def sorted_key_desc
+    SORTED_KEY_DESC
+  end
+        
+  def default_key_bind
+    DEFAULT_KEY_BIND
+  end
+
+  def switch_top
+    RdicMain::down_pane()
+    @first_disp = true
+  end
+  
+  def redraw
+    return unless allow_size?
+    @win.close()
+    @win = Window.new(0, 0, 0, 0)
+    y, x = @current_cursor_position
+    @current_cursor_position = [0,0] if y >= @win.maxy or x >= @win.maxx
+  end
+
+  def movetosol
+    @base_position = [0,0]
+    @current_cursor_position = [0, 0]
+    @win.clear
+  end
+
+  def save_filename
+    @inputyx_pos_ary = []
+    @dictionary_selected = []
+    @y_coordinate_type = {}
+    @y_coordinate_var = {}
+    @base_position = [0,0]
+    @current_cursor_position = [0,0]
+    @rdicmgr.filename_each { |dictionary_selected|
+      @dictionary_selected.push(dictionary_selected)
+    }
+  end
+  
+  def first_display(start_y)
+    y = start_y
+    @dictionary_selected.each { |dictionary_selected|
+      filename, selected = dictionary_selected
+      filename_disp = (filename.length > 30) ? filename[filename.length-30..-1] : filename
+      if selected
+        line = sprintf(FILENAME_PROMT[0], filename_disp, '*', ' ')
+        type = TYPE_YES
+      else
+        line = sprintf(FILENAME_PROMT[0], filename_disp, ' ', '*')
+        type = TYPE_NO
+      end
+      @y_coordinate_type[y] = type
+      @y_coordinate_var[y] = filename 
+      @inputyx_pos_ary.push([y,FILENAME_PROMT[1]])
+      @inputyx_pos_ary.push([y,FILENAME_PROMT[2]])
+      addstr(line,y,0)
+      y+=1
+    }
+    addstr(OK_PROMPT[0], y+=1, 0)
+    @y_coordinate_type[y] = TYPE_OK
+    @inputyx_pos_ary.push([y,OK_PROMPT[1]])
+    return y
+  end
+
+  def addstr(line, y, x)
+    if y-@base_position[0] < lines && y >= @base_position[0]
+      @win.setpos y-@base_position[0], x
+      @win.addstr line[@base_position[1],@win.maxx]
+    end
+  end
+  
+  def second_display(start_y)
+    y = start_y
+    @y_coordinate_type.each {|ky, type|
+      case type
+      when TYPE_YES 
+        filename = @y_coordinate_var[ky]
+        filename_disp = (filename.length > 30) ? filename[filename.length-30..-1] : filename
+        line = sprintf(FILENAME_PROMT[0], filename_disp , '*', ' ')
+      when TYPE_NO 
+        filename = @y_coordinate_var[ky]
+        filename_disp = (filename.length > 30) ? filename[filename.length-30..-1] : filename
+        line = sprintf(FILENAME_PROMT[0], filename_disp , ' ', '*')
+      when TYPE_OK
+        line = OK_PROMPT[0]
+      end
+      y = (ky > y) ? ky : y
+      addstr(line, ky, 0)
+    }
+    return y
+  end
+  
+  def paint
+    @win.clear
+    save_filename() if @first_disp
+    addstr(TITTLE, 0, 0)
+    addstr(VERSION, 1, 0)
+    addstr(SUB_TITTLE_01, 3, 0)
+    y = 5
+    if @first_disp
+      y = first_display(y)
+    else
+      y = second_display(y)
+    end
+    @first_disp = false
+    @lines = y
+    y, x = @current_cursor_position
+    @win.setpos y, x
+    @win.refresh
+  end
+
+  def search_start
+    y, x = get_current_position()
+    y+=@base_position[0]
+    x+=@base_position[1]
+    type = @y_coordinate_type[y]
+    case type
+    when TYPE_YES
+      @y_coordinate_type[y] = TYPE_NO if x == X_NO
+    when TYPE_NO
+      @y_coordinate_type[y] = TYPE_YES if x == X_YES
+    when TYPE_OK
+      if x >= X_OK && x <= X_OK+1
+        @y_coordinate_var.each{|yv,name|
+          type = @y_coordinate_type[yv]
+          case type
+          when TYPE_YES
+            @rdicmgr.update_rdic_selected(name,true)
+          when TYPE_NO
+            @rdicmgr.update_rdic_selected(name,false)
+          end
+        }
+        switch_top()
+      end
+    end
+  end
+
+  def get_current_position
+    y = @win.cury
+    x = @win.curx
+    return [y,x]
+  end
+
+  def right
+    y,x = @current_cursor_position
+    if x < Curses.cols-1
+      @current_cursor_position = [y,x+1]
+    else
+      if @base_position[1] < CENTER
+        @current_cursor_position = [y,0]
+        @base_position[1] = CENTER
+        @win.clear
+      end
+    end
+  end
+  
+  def left
+    y,x = @current_cursor_position
+    if x > 0
+      @current_cursor_position = [y,x-1]
+    else
+      if @base_position[1] > 0
+        @current_cursor_position = [y,cols-1]
+        @base_position[1] = 0
+        @win.clear
+      end
+    end
+  end
+  
+  def next_line
+    y,x = @current_cursor_position
+    y_rel = y+@base_position[0]
+    if y < Curses.lines-1
+      @current_cursor_position = [y+1,x]
+    elsif y_rel < @lines 
+      @base_position[0] += 1
+      @win.clear
+    end
+  end
+  
+  def prev_line
+    y,x = @current_cursor_position
+    if y > 0
+      @current_cursor_position = [y-1,x]
+    else
+      if @base_position[0] > 0
+        @base_position[0] -= 1
+        @win.clear
+      end
+    end
+  end
+
+  alias prev_word prev_line
+  alias next_word next_line
+
+  def move_next_cursor
+    y, x = get_current_position()
+    move_next_cursor_impl(y,x)
+  end
+
+  def move_next_cursor_impl(cur_y, cur_x)
+    rel_y = cur_y + @base_position[0]
+    rel_x = cur_x + @base_position[1]
+    @inputyx_pos_ary.each{|pos|
+      y,x = pos
+      next  if y < rel_y
+      next  if y == rel_y && x <= rel_x
+      if y-@base_position[0] >= lines
+        @base_position[0] += 1
+        move_next_cursor_impl(cur_y-1, cur_x)
+      elsif x-@base_position[1] > cols-1
+        if @base_position[1] < CENTER 
+          @base_position[1] = CENTER 
+          move_next_cursor_impl(cur_y, cur_x-CENTER)
+        else
+          @base_position[1] = x
+          @current_cursor_position = [y-@base_position[0], 0]
+        end
+      elsif x < @base_position[1]
+        @base_position[1] = x
+        @current_cursor_position = [y-@base_position[0], 0]
+      else
+        @current_cursor_position = [y-@base_position[0], x-@base_position[1]]
+      end
+      @win.clear
+      break
+    }
+  end
+
+  def move_prev_cursor
+    y, x = get_current_position()
+    move_prev_cursor_impl(y, x)
+  end
+  
+  def move_prev_cursor_impl(cur_y, cur_x)
+    rel_y = cur_y + @base_position[0]
+    rel_x = cur_x + @base_position[1]
+    @inputyx_pos_ary.reverse_each{|pos|
+      y,x = pos
+      next  if y-@base_position[0] >= lines
+      next  if y > rel_y
+      next  if y == rel_y && x >= rel_x
+      if y-@base_position[0] < 0
+        @base_position[0] -= 1
+        move_prev_cursor_impl(cur_y+1, cur_x)
+      elsif x-@base_position[1] > cols-1
+        if @base_position[1] < CENTER 
+          @base_position[1] = CENTER
+          move_prev_cursor_impl(cur_y, cur_x-CENTER)
+        else
+          @base_position[1] = x
+          @current_cursor_position = [y-@base_position[0], 0]
+        end
+      elsif x < @base_position[1]
+        @base_position[1] = x
+        @current_cursor_position = [y-@base_position[0], 0]
+      else
+        @current_cursor_position = [y-@base_position[0], x-@base_position[1]]
+      end
+      @win.clear
+      break
+    }
+  end
+
+end
+
+class RdicTextField
+
+  require "curses"
+  include Curses
+  include RdicViewCommon
+
+  attr_accessor :text, :cursor
+
+  SORTED_KEY_DESC = [
+  ]
+
+  DEFAULT_KEY_BIND = {
+  }
+  
+  INSERT = 1
+  OVERWRITE = 2
+
+  def initialize(root, h, w, top, left, prompt)
+    @root = root
+    @h, @w, @top, @left = h, w, top, left
+    @text = ''
+    @cursor = 0
+    @prompt = prompt
+    @prompt_length = @prompt.length
+    @win = Window.new(@h, @w, @top, @left)
+    @ctl = self
+    @mode = INSERT
+  end
+
+  def sorted_key_desc
+    SORTED_KEY_DESC
+  end
+        
+  def default_key_bind
+    DEFAULT_KEY_BIND
+  end
+
+  def redraw
+    return unless allow_size?
+    @win.close()
+    @win = Window.new(@h, @w, @top, @left)
+  end
+
+  def switch_insert
+    case @mode
+    when INSERT    then @mode = OVERWRITE
+    when OVERWRITE then @mode = INSERT
+    end
+  end
+
+  def text_changed
+  end
+
+  def typestring(c)
+    return unless allow_size?
+    over = (@mode==OVERWRITE) ? 1 : 0
+    over = Slice.can_slice?(@text, @cursor) ? 1 : 2 if over == 1
+    @text[@cursor, over] = c
+    @cursor += c.length
+    text_changed()
+  end
+
+  def movetosol 
+    @cursor = 0
+  end
+
+  def movetoeol 
+    @cursor = @text.length 
+  end
+  
+  def killtoeol 
+    @text = @text[0,@cursor]
+    text_changed()
+  end
+
+  def right 
+    if @cursor < @text.length
+      #n = (@text[@cursor,1] =~ /\w/ || @text[@cursor,1] =~ /\W/) ? 1 : 2
+      n = (32..126).include?(@text[@cursor]) ? 1 : 2
+      n.times {@cursor += 1}
+    else
+      Curses.beep
+    end
+  end
+  
+  def left 
+    if @cursor == 0
+      Curses.beep
+    else
+      #n = (@text[@cursor-1,1] =~ /\w/ || @text[@cursor-1,1] =~ /\W/) ? 1 : 2
+      n = (32..126).include?(@text[@cursor-1]) ? 1 : 2
+      n.times {@cursor -= 1}
+    end
+  end
+  
+  def delete 
+    if @cursor < @text.length
+      #n = (@text[@cursor,1] =~ /\w/ || @text[@cursor,1] =~ /\W/) ? 1 : 2
+      n = (32..126).include?(@text[@cursor]) ? 1 : 2
+      n.times {@text[@cursor,1] = ''}
+      text_changed()
+    else
+      Curses.beep
+    end
+  end
+  
+  def backspace
+    if @cursor == 0
+      Curses.beep
+    else
+      #n = (@text[@cursor-1,1] =~ /\w/ || @text[@cursor-1,1] =~ /\W/) ? 1 : 2
+      n = (32..126).include?(@text[@cursor-1]) ? 1 : 2
+      n.times {@cursor -= 1; @text[@cursor,1] = ''}
+      text_changed()
+    end
+  end
+  
+  def erase
+    @text = ''
+    @cursor = 0
+    text_changed()
+  end
+
+  def paint(prompt=@prompt)
+    @win.setpos 0,0
+    @win.addstr ' ' * cols
+    @win.setpos 0,0
+    @win.addstr paint_text(prompt)
+    @win.setpos 0,@prompt_length + @cursor
+    @win.refresh
+  end
+
+  def paint_text(prompt)
+    disp_cols = cols - 2 # 2:日本語入力域の確保
+
+    if @prompt_length > disp_cols
+      m = Slice.can_slice?(prompt, disp_cols-1) ? 0 : 1
+      prompt[0, disp_cols-m]
+    elsif (@prompt_length + @cursor) > disp_cols
+      n = @prompt_length + @cursor - disp_cols
+      m = Slice.can_slice?(@text, n-1) ? 0 : 1
+      word = @text[n+m..@cursor-1]
+      prompt + word
+    elsif (@prompt_length + @text.length) > disp_cols
+      n = disp_cols - @prompt_length
+      m = Slice.can_slice?(@text, n-1) ? 0 : 1
+      prompt + @text[0, n-m]
+    else
+      prompt + @text
+    end
+  end
+  
+end
+
+class RdicFilenameField < RdicTextField
+
+  undef_method :erase
+
+  def initialize(root, h, w, top, left, prompt)
+    super
+  end
+
+  def text_changed
+    @root.text_changed
+  end
+
+end
+
+class RdicFilePane
+
+  require "curses"
+  include Curses
+  include RdicViewCommon
+
+  SORTED_KEY_DESC = [
+    ["help_menu" , "ヘルプメニュー"],
+    ["switch_top", "キャンセル"],
+    ["complement", "補完"],
+    ["select",     "ファイル名確定"],
+  ]
+
+  DEFAULT_KEY_BIND = {
+    "f1"     => "help_menu",
+    "C-c"    => "switch_top",
+    "escape" => "switch_top",
+    "C-b"    => "switch_top",
+    "C-i"    => "complement",
+    "tab"    => "complement",
+    "enter"  => "select"
+  }
+  
+  PROMPT01 = "Save to: "
+
+  def initialize
+    @win1 = RdicFilenameField.new(self,0, 0, 0, 0,PROMPT01)
+    @prompt = PROMPT01
+    @prompt_length = @prompt.length
+    @win2 = Window.new(0, 0, 1, 0)
+    @ctl = [self, @win1]
+    @text_changed = true
+    @container = []
+    @cur_top = 0
+    @cur = 0
+    @y = 0
+  end
+
+  def sorted_key_desc
+    SORTED_KEY_DESC
+  end
+        
+  def default_key_bind
+    DEFAULT_KEY_BIND
+  end
+
+  def execute
+    RdicMain::up_pane(self, true)
+    catch :filepaneloop do
+      RdicMain::block()
+      loop {
+        RdicMain::msg_get_loop 
+      }
+    end
+    RdicMain::down_pane()
+    @win1.text
+  end
+
+  def text_changed
+    @text_changed = true
+    @container = []
+    @cur_top = 0
+    @cur = 0
+    @y = 0
+  end
+
+  def ajust_filename(filename)
+    if @win1.text.strip[0].chr  == '/'
+      filename
+    else
+      if filename =~ /^#{Dir::pwd}\//
+        $'                                #'
+      else
+        filename
+      end
+    end
+  end
+
+  def prefix_mach(ary)
+    filename = ary[0]
+    i = 0
+    br = false
+    filename.each_byte{|x| 
+      ary.each {|y|
+        br = true if x != y[i] 
+      }
+      break if br
+      i += 1
+    }
+    filename[0...i]
+  end
+
+  def expand
+    if @win1.text.strip == ''
+      slash = false
+    elsif @win1.text.strip == '/'
+      slash = false
+    elsif @win1.text[-1].chr == '/'
+      slash = true
+    else
+      slash = false
+    end
+    filename = File::expand_path(@win1.text)
+    if slash
+      filename = filename + '/'
+    else        
+      filename
+    end 
+  end   
+
+  def complement
+    if @text_changed
+      @text_changed = false
+    else
+      next_completion
+      return
+    end
+    filename = expand()
+    ary = []
+    if filename[-1].chr == '/'
+      path = filename
+      ary = Dir::entries(filename).find_all{|x| x !~ /\.$/} if File::directory?(path) 
+    else
+      path = File::dirname(filename)
+      path = path + '/' unless path == '/'
+      ary = Dir["#{filename}*"].map{|x| File::basename(x)}
+    end
+    ary.map!{|x| File::directory?(path+x) ? (x + '/') : x }
+    @win1.text = filename
+    case ary.size
+    when 0
+      ;
+    when 1
+      unless @win1.text == ajust_filename(path + ary[0])
+        @win1.text = ajust_filename(path + ary[0])
+        text_changed()
+      end
+    else
+      unless @win1.text == ajust_filename(path + prefix_mach(ary))
+        @win1.text = ajust_filename(path + prefix_mach(ary))
+        text_changed()
+      end
+    end
+    view(ary.sort)
+    @win1.cursor = @win1.text.length
+  end
+
+  def view(ary)
+    if ary.empty?
+      @container = ary
+      return
+    end
+    max_length = ary.map{|x| x.length}.max
+    colx = @win2.maxx / (max_length + 3)
+    colx = 1 if colx == 0
+    colx_length = @win2.maxx  / colx
+    
+    i = j = k = l = 0
+    max_y = @win2.maxy
+    @container = []
+    ary_size = ary.size
+    
+    while(i < ary_size) do
+      remainder = ary_size - i
+      liney = (remainder > max_y * colx) ? max_y : (remainder.to_f / colx).ceil
+      l = i + liney
+      while(i < l) do
+        j = i
+        line = ''
+        colx.times {|x|
+          k = j + liney * x
+          line << sprintf("%-#{colx_length}s", ary[k]) if ary[k]
+        }
+        @container.push(line)
+        i += 1
+      end
+      i = k + 1
+    end
+  end
+  
+  def switch_top
+    @win1.text = ''
+    throw :filepaneloop 
+  end
+  
+  def select
+    @win1.text = expand()
+    throw :filepaneloop 
+  end
+  
+  def redraw
+    return unless allow_size?
+    @win1.redraw
+    @win1.paint
+    @win2.close()
+    @win2 = Window.new(0, 0, 1, 0)
+  end
+
+  def paint()
+    paint_view unless @container.empty?
+    @win1.paint()
+  end
+  
+  def paint_view
+    i = 0
+    @win2.clear
+    @container[@cur_top .. -1].each {|word|
+      @win2.setpos i, 0
+      if word.length+1 < @win2.maxx
+        @win2.addstr word
+      else
+        c = @win2.maxx - 2
+        if Slice.can_slice?(word,c)
+          @win2.addstr word[0,c]
+        else
+          @win2.addstr word[0,c-1]
+        end
+      end
+      i += 1
+      break if i >= @win2.maxy
+    }
+    @win2.refresh
+  end
+
+  def next_completion
+    if (@cur_top + @win2.maxy) < @container.size 
+      @cur_top += (@win2.maxy)
+      @cur = @cur_top
+      @y = 0
+    else
+      @cur_top = 0
+      @cur = 0
+      @y = 0
+    end
+  end
+
+end
+
+class RdicMessageBox
+
+  require "curses"
+  include Curses
+  include RdicViewCommon
+  
+  SORTED_KEY_DESC = [
+    ["help_menu" , "ヘルプメニュー"],
+    ["switch_top", "キャンセル"],
+    ["default_sel", "デフォルト選択"],
+  ]
+
+  DEFAULT_KEY_BIND = {
+    "f1"     => "help_menu",
+    "C-c"    => "switch_top",     # cancle
+    "C-b"    => "switch_top",     # back panel
+    "escape" => "switch_top",     # cancel
+    "enter"  => "default_sel",    # cancel
+  }
+
+  def initialize(root, layout, prompt, all_chr, default_chr, cancel_chr)
+    @root = root
+    @horizontal, @vertical = layout
+    @prompt = prompt
+    @text = ''
+    @cursor = 0
+    @prompt_ary      = slicexx(@prompt.split("\t"))
+    @prompt_xmaxsize = @prompt_ary.map{|x| x.length}.max
+    @prompt_ysize    = gety()
+    @h, @w, @top, @left = @prompt_ysize,0,get_top(),0
+    @win = Window.new(@h, @w, @top, @left)
+    @ctl = self
+    @all_chr, @default_chr, @cancel_chr = all_chr, default_chr, cancel_chr
+  end
+
+  def slicexx(ary)
+    i=0
+    oary = []
+    col = Curses.cols
+    ary.each{|line|
+      while (line.length > 0)
+        if line.length <= col
+          oary << line
+          break
+        end
+        oary << Slice.slice_line!(line,col)
+        i+=1
+      end
+      i+=1
+    }
+    oary
+  end
+  
+  def sorted_key_desc
+    SORTED_KEY_DESC
+  end
+        
+  def default_key_bind
+    DEFAULT_KEY_BIND
+  end
+
+  def text_changed
+    @root.text_changed
+  end
+
+  def execute
+    RdicMain::up_pane(self, true)
+    catch :msgboxloop do
+      RdicMain::block()
+      loop {
+        RdicMain::msg_get_loop
+      }
+    end
+    RdicMain::down_pane()
+    @text
+  end
+  
+  def default_sel
+    @text = @default_chr
+    throw :msgboxloop 
+  end
+  
+  def switch_top
+    @text = @cancel_chr
+    throw :msgboxloop 
+  end
+
+  def typestring(c)
+    return unless allow_size?
+    if @all_chr.include?(c)
+      @text = c
+    else
+      @text = @default_chr
+    end
+    throw :msgboxloop 
+  end
+
+  def redraw
+    unless allow_size?
+      return
+    end
+    if @root
+      @root.redraw
+    end
+    @prompt_ary      = slicexx(@prompt.split("\t"))
+    @prompt_xmaxsize = @prompt_ary.map{|x| x.length}.max
+    @prompt_ysize    = gety()
+    @h, @w, @top, @left = @prompt_ysize,0,get_top(),0
+    @win.close()
+    @win = Window.new(@h, @w, @top, @left)
+  end
+
+  def getx
+    case @horizontal
+    when :left
+      0
+    when :center
+      if @prompt_xmaxsize > Curses.cols
+        0
+      else
+        (Curses.cols - @prompt_xmaxsize) / 2
+      end
+    when :right
+      if @prompt_xmaxsize > Curses.cols
+        0
+      else
+        Curses.cols - @prompt_xmaxsize
+      end
+    end
+  end
+
+  def gety
+    (@prompt_ary.size > Curses.lines) ? Curses.lines : @prompt_ary.size 
+  end
+
+  def get_top
+    case @vertical
+    when :top
+      0
+    when :center
+      if @prompt_ysize > Curses.lines
+        0
+      else
+        (Curses.lines - @prompt_ysize) / 2
+      end
+    when :bottom
+      if @prompt_ysize > Curses.lines
+        0
+      else
+        Curses.lines - @prompt_ysize
+      end
+    end
+  end
+
+  def paint
+    if @root
+      @root.paint
+    else
+      Curses.clear
+      Curses.refresh
+    end
+    x = getx()
+    y = 0     #gety()
+    @prompt_ary.each { |l|
+      xx = x
+      if @horizontal == :center
+        if l =~ /^\[/
+          xx = (Curses.cols - l.size) / 2
+        end
+      end
+      @cursor = xx
+      if l =~ /^\[/
+        @prompt_length = 1 
+      else
+        @prompt_length = l.length
+      end
+      paint_impl(l,xx,y)
+      y += 1
+      break if y > @prompt_ysize
+    }
+  end
+
+  def paint_impl(prompt, x, y)
+    #@win.setpos y,0
+    #@win.addstr ' ' * cols
+    @win.setpos y,x
+    @win.addstr paint_text(prompt)
+    @win.setpos y,@prompt_length + @cursor
+    @win.refresh
+  end
+
+  def paint_text(prompt)
+    disp_cols = Curses.cols # - 2 # 2:日本語入力域の確保
+
+    if @prompt_length > disp_cols
+      m = Slice.can_slice?(prompt, disp_cols-1) ? 0 : 1
+      prompt[0, disp_cols-m]
+    elsif (@prompt_length + @cursor) > disp_cols
+      n = @prompt_length + @cursor - disp_cols
+      m = Slice.can_slice?(@text, n-1) ? 0 : 1
+      word = @text[n+m..@cursor-1]
+      prompt + word
+    elsif (@prompt_length + @text.length) > disp_cols
+      n = disp_cols - @prompt_length
+      m = Slice.can_slice?(@text, n-1) ? 0 : 1
+      prompt + @text[0, n-m]
+    else
+      prompt + @text
+    end
+  end
+  
+end
+
+class RdicListBox
+
+  require "curses"
+  include Curses
+  include RdicViewCommon
+
+  SORTED_KEY_DESC = [
+    ["help_menu"   , "ヘルプメニュー"],
+    ["switch_top"  , "キャンセル"],
+    ["prev_word"   , "前の行"],
+    ["next_word"   , "次の行"],
+    ["search_start", "選択"]
+  ]
+
+  DEFAULT_KEY_BIND = {
+    "f1"     => "help_menu",
+    "C-c"    => "switch_top",
+    "C-b"    => "switch_top",
+    "escape" => "switch_top",
+  }
+
+  def initialize(root, container, h, w, top, left)
+    @root = root
+    @container = container
+    @h, @w, @top, @left = h, w, top, left
+    @win = Window.new(@h, @w, @top, @left)
+    @ctl = self
+    @cur_top = 0
+    @cur = 0
+    @y = 0
+  end
+
+  def sorted_key_desc
+    SORTED_KEY_DESC
+  end
+        
+  def default_key_bind
+    DEFAULT_KEY_BIND
+  end
+
+  def switch_top
+    RdicMain::down_pane()
+  end
+
+  def redraw
+    return unless allow_size?
+    @root.paint() if @root
+    @win.close()
+    @win = Window.new(@h, @w, @top, @left)
+    adjust()
+  end
+
+  def next_page
+    if (@cur_top + @win.maxy) < @container.size 
+      @cur_top += @win.maxy
+      @cur = @cur_top
+      @y = 0
+    else
+      Curses.beep
+    end
+  end
+
+  def prev_page
+    return if @cur_top == 0
+    if (@cur_top - @win.maxy) > 0 
+      @cur_top -= @win.maxy
+      @cur = @cur_top
+      @y = 0
+    else
+      @cur_top = 0
+      @cur = 0
+      @y = 0
+    end
+  end
+
+  def prev_line
+    if @cur == 0
+      Curses.beep
+    else
+      @cur -= 1 
+      if @cur < @cur_top
+        @cur_top -= 1
+      else
+        @y   -= 1
+      end
+    end
+  end
+
+  def next_line
+    if @cur < @container.size - 1 
+      @cur += 1
+      if @y < @win.maxy - 1
+        @y   += 1
+      else
+        @cur_top += 1
+      end
+    else
+      Curses.beep
+    end
+  end
+    
+  def adjust
+    unless @y < @win.maxy
+      @y = @win.maxy - 1
+      @cur = @cur_top + @win.maxy - 1
+    end
+  end
+
+  def paint_lines
+    i = 0
+    @win.clear
+    @container[@cur_top .. -1].each {|word|
+      @win.setpos i, 0
+      sel = i + @cur_top
+      @win.addstr ' '
+      sel = -1 if RUBY_VERSION < '1.8.0'
+      @win.attron(Curses::A_REVERSE) if @cur == sel
+      if word.length+1 < @win.maxx
+        @win.addstr word
+      else
+        c = @win.maxx - 2
+        if Slice.can_slice?(word,c)
+          @win.addstr word[0,c]
+        else
+          @win.addstr word[0,c-1]
+        end
+      end
+      @win.attroff(Curses::A_REVERSE) if @cur == sel
+      i += 1
+      break if i >= @win.maxy
+    }
+  end
+
+  def paint
+    paint_lines()
+    @win.setpos @y, 0 
+    @win.refresh
+  end
+
+  alias prev_word prev_line
+  alias next_word next_line
+
+end
+
+class RdicHistoryPanel < RdicListBox
+
+  require "curses"
+  include Curses
+  
+  PROMPT01 = "no view_command in config file \t[OK]"
+  PROMPT02_1 = "File exists. Overwrite "
+  PROMPT02_2 = "? [y/N]"
+  PROMPT03_1 = "Can't open "
+  PROMPT03_2 = "\t[OK]"
+
+  SORTED_KEY_DESC = [
+    ["help_menu"   , "ヘルプメニュー"],
+    ["switch_top"  , "キャンセル"],
+    ["save"        , "ヒストリー検索保存"],
+    ["view"        , "ヒストリー検索保存表示"],
+    ["killtoeol"   , "削除"],
+    ["clear"       , "全件削除"],
+    ["undo"        , "アンドゥ"],
+    ["prev_word"   , "前の行"],
+    ["next_word"   , "次の行"],
+    ["search_start", "選択"],
+  ]
+
+  DEFAULT_KEY_BIND = {
+    "f1"     => "help_menu",
+    "C-b"    => "switch_top",
+    "escape" => "switch_top",
+    "C-s"    => "save",
+    "C-v"    => "view",
+    "C-k"    => "killtoeol",
+    "C-c"    => "clear",
+    "C-u"    => "undo",
+  }
+
+  def initialize(root, container, h, w, top, width)
+    @changed = false
+    @memento = []
+    super
+    RdicMain::up_pane(self, true)
+  end
+
+  def sorted_key_desc
+    SORTED_KEY_DESC
+  end
+        
+  def default_key_bind
+    DEFAULT_KEY_BIND
+  end
+
+  def search_start
+    if @container[@cur]
+      RdicMain::put_msg(['erase'])
+      RdicMain::put_msg(['typestring_from_selection', @container[@cur].dup])
+    end
+    switch_top()
+  end
+  
+  def view
+    @view = true
+    save_view
+  end
+
+  def save
+    @view = false
+    save_view
+  end
+
+  def save_view
+    if @view 
+      if RdicMain::view_command.empty? 
+        RdicMessageBox.new(nil,[:center, :center],PROMPT01,['y','n'],'n','n').execute()
+        return
+      end
+    end
+    filename = RdicFilePane.new.execute()
+    unless filename.empty?
+      if File.exists? filename
+        y_or_n = RdicMessageBox.new(self,[:left, :top],PROMPT02_1 + "'#{filename}'" + PROMPT02_2,['y','n'],'n','n').execute()
+        save_impl(filename) if y_or_n == 'y'
+      else
+        save_impl(filename)
+      end
+    end
+  end
+
+  def save_impl(filename)
+    begin
+      File.open(filename, "w+") {|f|
+        @container.uniq.reverse_each {|item|
+          #item_x = item.scan(/[A-Za-z_\d'-]+|[^\Wa-zA-Z_\dを#{RdicMain::KIGOU}]+/).join(' ').strip # '
+          Stem.stem(item.scan(/[\w'-]+/).join(' ').strip).split('|').each {|word|                   # '
+            RdicMain::rdicmgr.lookup_complete_match_each(word, false) {|line| 
+              f.write(line.gsub(/\t/,"\n"))
+              f.write("\n")
+              GC.start
+            }
+          }
+        }
+      }
+      if @view 
+        command = format(RdicMain::view_command, filename)
+        command_exec(command)
+        redraw()
+      end
+    rescue
+      prompt = PROMPT03_1 + filename.strip + PROMPT03_2
+      RdicMessageBox.new(nil,[:center, :center],prompt,['y','n'],'n','n').execute()
+    end
+  end
+  
+  def killtoeol
+    if (str = @container[@cur])
+      add_memento(@container.dup, @cur, @y, @cur_top)
+      @container.delete_at(@cur)
+      @changed = true
+    end
+    unless @container[@cur]
+      @cur -= 1
+      @y -= 1
+    end
+    if @y < 0
+      @cur_top = 0
+      @cur = 0
+      @y = 0
+    end
+
+    redraw
+  end
+  
+  def clear
+    unless @container.empty? 
+      add_memento(@container.dup, @cur, @y, @cur_top)
+      @container.clear
+      @changed = true
+      @cur_top = 0
+      @cur = 0
+      @y = 0
+      redraw
+    end
+  end
+
+  def add_memento(*data)
+    @memento.push(data)
+  end
+
+  def undo
+    unless @memento.empty?
+      @container, @cur, @y, @cur_top = @memento.pop
+      redraw
+    end
+  end
+
+  def switch_top
+    RdicMain::put_msg(['reset_history', @container.reverse]) if @changed
+    RdicMain::down_pane()
+  end
+
+end
+
+class RdicFuzzyPanel < RdicListBox
+
+  def initialize(root, container, h, w, top, width)
+    super
+    RdicMain::up_pane(self, true)
+  end
+  
+  def search_start
+    if @container[@cur]
+      RdicMain::put_msg(['shift_fuzzy', @cur])
+    end
+    switch_top()
+  end
+
+end
+
+class RdicHelpPane < RdicListBox
+
+  def initialize(root, container, h, w, top, width)
+    @container_org = container
+    c = container.map {|x|
+      key, desc = x
+      format("%-25s%s", key.join(','), desc)
+    }
+    super(root, c, h, w, top, width)
+    RdicMain::up_pane(self, true)
+  end
+  
+  def search_start
+    if @container[@cur]
+      RdicMain::put_msg([@container_org[@cur][2]])
+    end
+    switch_top()
+  end
+
+end
+
+module RdicMain
+  extend self
+  
+  attr_accessor :bold, :reverse,:indent, :blocktime, :list_regexp, :example, :prefix,
+      :max_xselection_length, :history_depth, :separator, :say_command, :view_command, 
+          :rdicmgr, :pane_q, :msg_q, :history, :history_file
+  @xselection_open = false
+  KIGOU = '　、。，．・：；？！゛゜´｀¨＾‾＿ヽヾゝゞ〃仝々〆〇‐／＼〜‖｜…‥‘’“”（）〔〕［］｛｝〈〉《》「」『』【】＋−±×÷＝≠＜＞≦≧∞∴♂♀°′″℃¥＄¢£％＃＆＊＠§☆★○●◎◇◆□■△▲▽▼※〒→←↑↓〓∈∋⊆⊇⊂⊃∪∩∧∨¬⇒⇔∀∃∠⊥⌒∂∇≡≒≪≫√∽∝∵∫∬Å‰♯♭♪†‡¶◯'
+  
+# begin
+#  require 'uconv'
+#    def u2e(chunk)
+#      chunk.gsub(/\\u([0-9A-Fa-f]{2})([0-9A-Fa-f]{2})/) {
+#        Uconv::u16toeuc("%c%c" % [$2.hex, $1.hex])
+#      }
+#    end
+#  rescue LoadError
+#  def u2e(chunk)
+#    chunk
+#  end
+# end
+
+# added by nari 2011-11-20
+begin
+  require 'nkf'
+  def u2e(chunk)
+    NKF.nkf("-e", chunk)
+  end
+end
+
+  
+  def trapmsg
+    oldstate=Thread.critical
+    Thread.critical=true
+    curses_close()
+    curses_init()
+    @pane_q.last.delegete_to_ctl('redraw')
+    @pane_q.last.delegete_to_ctl('paint') # because this thread is not main.
+    Thread.critical=oldstate
+  end
+  
+  def curses_init
+    Curses.init_screen
+    Curses.nonl      
+    Curses.cbreak  
+    Curses.noecho
+    Curses.raw
+    Curses.refresh
+  end
+  
+  def curses_close
+    Curses.nl      
+    Curses.nocbreak  
+    Curses.echo
+    Curses.noraw
+    Curses.close_screen
+  end
+  
+  def block
+    @block = true
+  end
+
+  def non_block
+    @block = false
+  end
+
+  def up_pane(pane, block)
+    @block_status_q.push(block)
+    @block = block
+    @pane_q.push(pane)
+  end
+    
+  def down_pane
+    @block_status_q.pop()
+    @block = @block_status_q.last
+    Curses.clear
+    @pane_q.pop()
+    @pane_q.last.delegete_to_ctl('redraw')
+  end
+
+  def set_root_pane(pane, block)
+    @pane_q = [pane]
+    @block_status_q = [block]
+    @block = block
+  end
+    
+  def quit
+    throw :quitloop
+  end
+
+  def run
+
+    require 'curses'
+    include Curses
+    
+    yield if block_given?
+    curses_init()
+    
+    trap('WINCH'){
+      trapmsg
+    }
+
+    begin
+      catch :quitloop do
+        @msg_q = []
+        loop {
+          msg_get_loop
+        }
+      end
+      @history.save_history_file()
+    rescue
+      raise
+    ensure
+      Curses.close_screen
+      @xselection.close() if @xselection_open
+    end
+  end
+
+  def msg_get_loop
+    GC.start
+    while(msg = @msg_q.shift)
+      method_name, input_chr = msg 
+      @pane_q.last.delegete_to_ctl(method_name,input_chr)
+    end
+    @pane_q.last.delegete_to_ctl('paint')
+    blocktime = (@block) ? nil : @blocktime
+    get_msg(@pane_q.last,blocktime) {|method_name,input_chr|
+      put_msg([method_name,input_chr])
+    }
+  end
+  
+  def put_msg(msg)
+    @msg_q.push(msg)
+  end
+  
+  def peek_msg
+    get_msg(@pane_q.last, 0, true) {|method_name,input_chr|
+      put_msg([method_name,input_chr])
+      return [method_name,input_chr]
+    }
+    return nil
+  end
+  
+  def get_msg(pane, blocktime, peek = false)
+    save_blocktime = blocktime
+    kanji = ''
+    escape_sequence = ''
+    msgq = []
+    peek_stop = false
+    while msgq.empty? && !(peek_stop)
+      if IO.select([$stdin],[],[],blocktime)
+        c_int = $stdin.getc
+        if c_int == 27 # Esc
+          escape_sequence << c_int.chr
+          blocktime = 0.01
+        elsif (0..127).include?(c_int) # 127 is delete key
+          if not escape_sequence.empty?
+            escape_sequence << c_int.chr
+            blocktime = 0.01
+          else
+            if keynm = Termkey.keyname(c_int.chr)
+              if pane.keybind(keynm)
+                    msgq << pane.keybind(keynm)
+              end
+            else
+              msgq << ['typestring', c_int.chr] unless (0..31).include?(c_int)
+            end
+          end
+        else
+          kanji = kanji + c_int.chr
+          if kanji.length == 2
+            msgq << ['typestring', kanji]
+            kanji = ''
+          #else
+            #blocktime = 0
+          end
+        end
+      else
+        peek_stop = true if peek
+        blocktime = save_blocktime
+        kanji = ''
+        if not escape_sequence.empty?
+          if Termkey.keymatch?(escape_sequence) 
+            if keynm = Termkey.keyname(escape_sequence)
+              msgq << pane.keybind(keynm) if pane.keybind(keynm)
+            end
+          end
+          escape_sequence = ''
+        else
+          if respond_to?(:get_selection) && blocktime
+            msgq = get_selection()
+          end
+        end
+      end
+    end
+    while(msg = msgq.shift)
+      yield msg
+        # yield *msg
+    end
+  end
+
+  def get_selection
+    msg = []
+    @first_getsel = true unless defined? @first_getsel
+    if @first_getsel
+      unless ENV['DISPLAY']
+        raise "DISPLAY is not available.\n -x option is available if you use on non X terminal."
+      end
+      @xselection = Xselection.new(ENV['DISPLAY'])
+      @xselection_open = true
+      @first_getsel = false
+    end
+    str = @xselection.check()
+    if str
+      # added by nari 2011-11-20
+      str = u2e(str)
+      str.gsub!(/\n/,' ')
+      str.gsub!(/\s+/,' ')
+      if (len = str.length) > @max_xselection_length
+        if Slice.can_slice?(str, @max_xselection_length-1)
+          len = @max_xselection_length
+        else
+          len = @max_xselection_length-1
+        end
+      end
+      msg << ["typestring_from_selection", str[0, len]]
+    end
+    return msg
+  end
+
+end
+
+if $0 == __FILE__
+  # require 'kconv'
+  require 'jcode'
+  require 'getoptlong.rb'
+  
+  $KCODE = "e"
+
+  # defaults
+  path=ENV['HOME']+'/.rdic'+RUBY_VERSION[0..-3]+'/'
+  separator = ' : '
+  prefix = '■'
+  xinterval = 0.3
+  noprefix = false
+  xselection = true
+  learnkey = false
+  bold = false
+  reverse = false
+  indent = 1
+  config = ''
+  list_regexp = /^\241(?=\332)|^・/ # \241\332 == "【"
+  example = /^【用例|^・/
+  max_xselection_length = 1000
+  history_depth = 500
+  say_command = ''
+  view_command = ''
+  dictionary = []
+  history_file = "#{path}history"
+
+  def usage
+    print "使用法: #{$0} [option...] 辞書ファイル...\n"
+    print "Options:\n"
+    print " -x --noselection      自動検索しない\n"
+    print " -l --learnkey         キー情報ファイルを再作成する\n" 
+    print " -p --noprefix         プレフィックスを表示しない\n"
+    print " -b --bold             見出し語をBOLD表示する\n"
+    print " -r --reverse          先頭見出し語をREVERSE表示する\n"
+    print " --prefix=string       プレフィックスを指定\n"
+    print " --separator=string    セパレータを指定\n"
+    print " --interval=second     自動検索する間隔秒を変更する\n"
+    print " --indent=column       インデントする桁数を指定する\n"
+    print " --config=file         初期設定ファイル名を指定する\n"
+    print " --history=file        ヒストリーファイル名を指定する\n"
+    print " -h --help             このヘルプを表示して終了\n"
+    print " -v --version          バージョン番号を表示して終了\n"
+    print "Defaults:\n"
+    print " 自動検索の間隔は   0.3秒\n"
+    print " プレフィックスは   \"■\" \n"
+    print " セパレータは       \" : \"\n"
+    print " インデントは       1\n"
+    print " 初期設定ファイルは $HOME/.rdic#{RUBY_VERSION[0..-3]}/rdic.conf\n"
+    print " ヒストリーファイルは $HOME/.rdic#{RUBY_VERSION[0..-3]}/history\n"
+    print "\n"
+    print "キー情報ファイルは $HOME/.rdic#{RUBY_VERSION[0..-3]}/$TERM.key が使われます\n"
+    print "例) $ rdic /var/dic/EIJIRO52.euc /var/dic/WAEIJI52.euc\n"
+    exit(0)
+  end
+  
+  def usage_error(msg)
+    print msg
+    exit(0)
+  end
+
+  def version
+    print "rdic version " + RDIC_VERSION,"\n"
+    exit(0)
+  end
+  
+  if File::file?("#{path}rdic.conf" )
+    eval( File::open( "#{path}rdic.conf" ){|f| f.read }.untaint )
+  end
+
+  parser = GetoptLong.new
+  parser.set_options(
+                     ['--config=',           GetoptLong::REQUIRED_ARGUMENT],
+                     ['--history=',          GetoptLong::REQUIRED_ARGUMENT],
+                     ['--noprefix',    '-p', GetoptLong::NO_ARGUMENT],
+                     ['--bold',        '-b', GetoptLong::NO_ARGUMENT],
+                     ['--reverse',     '-r', GetoptLong::NO_ARGUMENT],
+                     ['--noselection', '-x', GetoptLong::NO_ARGUMENT],
+                     ['--interval=',         GetoptLong::REQUIRED_ARGUMENT],
+                     ['--learnkey',    '-l', GetoptLong::NO_ARGUMENT],
+                     ['--prefix=',           GetoptLong::REQUIRED_ARGUMENT],
+                     ['--separator=',        GetoptLong::REQUIRED_ARGUMENT],
+                     ['--indent=',           GetoptLong::REQUIRED_ARGUMENT],
+                     ['--help',        '-h', GetoptLong::NO_ARGUMENT],
+                     ['--version',     '-v', GetoptLong::NO_ARGUMENT]
+                     )
+  begin
+
+    parser.each{|option,arg|
+      case option
+      when '--noprefix'
+        noprefix = true
+      when '-b'
+        bold = true
+      when '--bold'
+        bold = true
+      when '-r'
+        reverse = true
+      when '--reverse'
+        reverse = true
+      when '-x'
+        xselection = false
+      when '--noselection'
+        xselection = false
+      when '--interval='
+        arg ||= ''
+        unless arg =~ /^\d+\.?\d*$|^\.\d+$/
+          usage_error("--interval=#{arg} : 自動間隔秒に数値が指定されていません\n")
+        end
+        xinterval = arg.to_f
+        xselection = true
+      when '--learnkey'
+        learnkey = true
+      when '--config='
+        arg ||= ''
+        usage_error("--config=#{arg} : 設定ファイルが指定されていません\n") if arg.empty?
+        config = File::expand_path(arg)
+        usage_error("#{config} : そのようなファイルはありません\n") unless File::file?("#{config}")
+        eval( File::open( "#{config}" ){|f| f.read }.untaint ) unless config.empty?
+      when '--history='
+        arg ||= ''
+        usage_error("--history=#{arg} : ヒストリーファイルが指定されていません\n") if arg.empty?
+        history_file = File::expand_path(arg)
+        if File::exists?("#{history_file}")
+          unless File::readable_real?("#{history_file}") && File::writable_real?("#{history_file}")
+            usage_error("--history=#{history_file} : 許可がありません\n")
+          end
+        else
+          begin
+            File::open("#{history_file}", "w+"){|f|}
+          rescue
+            usage_error("--history=#{history_file} : オープンできません\n")
+          end
+        end
+      when '--prefix='
+        arg ||= ''
+        prefix = case arg
+                 when '""', "''" then ''
+                 else arg
+                 end
+      when '--separator='
+        arg ||= ''
+        separator = case arg
+                    when '\n', '"\n"' then "\n"
+                    when '\t', '"\t"' then "\t"
+                    else sep
+                    end
+      when '--indent='
+        arg ||= ''
+        usage_error("--indent=#{arg} : インデントに数値が指定されていません\n") unless arg =~ /^\d+$/
+        indent = arg.to_i
+      when '--help'    
+        usage()
+      when '--version'
+        version()
+      end
+    }
+  rescue
+    exit(1)
+  end
+  
+  if (p = ARGV.shift) 
+    dictionary.clear
+    begin
+      dictionary.push(p) 
+    end while(p = ARGV.shift) 
+  end
+  
+  if learnkey
+    Termkey.learn_key()
+    exit(0) if dictionary.length == 0
+  else
+    Termkey.init_key()
+  end
+  
+  if dictionary.length == 0
+    usage_error("#{$0}: 引数に辞書ファイルが指定されていません\n詳しくは '#{$0} --help' を実行して下さい.\n")
+  end
+
+  begin
+
+    RdicMain::blocktime = xinterval
+    RdicMain::bold = (RUBY_VERSION >= '1.8.0') ? bold : false
+    RdicMain::reverse = (RUBY_VERSION >= '1.8.0') ? reverse : false
+    RdicMain::indent = indent 
+    RdicMain::list_regexp = list_regexp
+    RdicMain::example = example
+    RdicMain::max_xselection_length = max_xselection_length
+    RdicMain::history_depth = history_depth
+    RdicMain::prefix = prefix
+    RdicMain::separator = separator
+    RdicMain::say_command = say_command
+    RdicMain::view_command = view_command
+    RdicMain::history_file = history_file
+
+    history = RdicHistory.new(history_depth, history_file)
+    RdicMain::history = history
+
+    while(arg = dictionary.shift)
+      file = File::expand_path(arg)
+      usage_error("#{file} : そのようなファイルはありません\n") unless File::file?("#{file}")
+      dicname = file
+      rdicmgr = DictionaryMgr.instance()
+      rdic = MmapDictionary.new(dicname, prefix, separator)
+      rdicmgr.add_dictionary(file, rdic)
+    end
+
+    RdicMain::rdicmgr = rdicmgr
+    
+    if xselection
+      require 'xselection'
+    else
+      module RdicMain
+        undef_method :get_selection
+      end
+      xinterval = nil
+    end
+    
+    file='keymap'
+    if File.file? path+file
+      File.open(path+file) {|keymap|
+        keymap.each_line { |line|
+          case line.strip!
+          when /^#/n               # comment
+            ;
+          when /^addkey\b/n  # anyword=
+            ary = line.split(/\s+/)
+            usage_error("#{path+file}: #{line}\n構文に誤りがあります。\n")  if ary.size != 3
+            usage_error("#{path+file}: #{line}\nキーに誤りがあります。\n")  unless Termkey.valuematch?(ary[1])
+            usage_error("#{path+file}: #{line}\nコマンドに誤りがあります。\n")  unless RdicKey.valid_function?(ary[2])
+            RdicKey.add_keybind(ary[1], ary[2])
+          when /^delkey\b/n
+            ary = line.split(/\s+/)
+            usage_error("#{path+file}: #{line}\n構文に誤りがあります。\n")  if ary.size != 2
+            usage_error("#{path+file}: #{line}\nキーに誤りがあります。\n")  unless Termkey.valuematch?(ary[1])
+            RdicKey.delete_keybind(ary[1])
+          else
+            usage_error("#{path+file}: #{line}\n構文に誤りがあります。\n") unless line.length == 0
+          end
+        }
+      }
+      GC.start
+    end
+    
+    file='eliminate'
+    if File.file? path+file
+      File.open(path+file){|f|
+        Stem.clear_eliminate_word
+        f.each_line { |line|
+          case line.strip!
+          when /^#/n               # comment
+            ;
+          else
+            line.split(',').each {|x| 
+              Stem.add_eliminate_word(x.strip) unless x.strip.empty?
+            }
+          end
+        }
+      }
+      GC.start
+    end
+    
+    RdicMain::run do
+      rdicctl = RdicViewControll.new(rdicmgr, history)
+      if noprefix
+        rdicctl.add_filter_proc { |line, grep_mode| 
+          (grep_mode) ? line : line[prefix.length..line.length]
+        }
+      end
+      RdicMain::set_root_pane(rdicctl, (xselection) ? false : true) 
+    end
+    
+    exit(0)
+  rescue
+    print "Error : #{$!}\n"
+    puts $@.join( "\n" )
+    exit(1)
+  end
+  
+end

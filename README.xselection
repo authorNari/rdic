@@ -1,0 +1,27 @@
+
+  The Xselection module implement get String from X selection.
+
+  * instllation
+
+    ruby extconf.rb
+    make
+    make install
+
+  * Documentation
+
+    See xselection.rd
+
+ * Copying
+
+  This extension module is copyrighted free software by Dave Scotto
+
+  You can redistribute it and/or modify it under the same term as
+  Ruby.
+  
+
+
+
+                                                       Dave Scotto
+                                               dave@yasgursfarm.us
+                                         http://www.yasgursfarm.us
+

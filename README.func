@@ -1,0 +1,43 @@
+help_menu		ヘルプメニュー
+prev_page		前のページ
+next_page		次のページ
+movetosol		カーソルを先頭に
+movetoeol		カーソルを末尾へ 
+prev_line		前の行
+next_line		次の行
+right			カーソルを右へ
+left			カーソルを左へ
+prev_word		前の単語を先頭に
+next_word		次の単語を先頭に
+erase			全文字削除
+killtoeol		カーソル以降の全文字削除
+delete			カーソル上の文字削除
+backspace		カーソル前の文字削除 
+switch_insert		挿入/上書スイッチ
+switch_case		大文字/小文字検索の区別スイッチ
+switch_grep		正規表現検索スイッチ
+search_start		正規表現検索開始/再検索開始
+switch_example_display	用例表示のon/off
+switch_set_pane		辞書選択パネルへ
+capitalize		先頭文字を大文字に残りを小文字に
+downcase		大文字を小文字に
+upcase			小文字を大文字に
+redraw			再表示
+quit			終了
+
+fuzzy_search_start	連語あいまい検索開始
+prev_history		前のhistoryを表示
+next_history		次のhistoryを表示
+prev_fuzzy		連語あいまい検索時に対象語を左シフト
+next_fuzzy		連語あいまい検索時に対象語を右シフト
+
+next_history_search_start 次のhistoryの検索開始
+prev_history_search_start 前のhistoryの検索開始
+
+switch_historypane	ヒストリー表示パネルヘ
+switch_fuzzypane	あいまい検索ワード表示パネルへ
+
+say_top_word		先頭の見出し語を読み上げ
+say_input_word		入力を読み上げ
+
+push_history		historyに先頭見出し語を登録

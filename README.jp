@@ -1,0 +1,531 @@
+                                                                     2003-09-15
+特徴
+
+    * Ruby, Curses, Mmapを使った CUI
+    * 自動検索機能 (連語の自動判別、あいまい検索機能付き)
+    * インクリメンタルサーチ
+    * 大文字/小文字の区別スイッチ
+    * ruby正規表現による全件検索（検索途中でもキー操作可能）
+    * 用例の表示 on/off スイッチ
+    * emacs風キーバインド
+    * 辞書選択
+
+必要なもの
+
+    * [Ruby 1.6.7 以降] (1.6.6以前で動作確認していません）
+      まつもとゆきひろ氏作成 オブジェクト指向スクリプト言語
+    * [Mmap 0.1.7 以降]
+      Guy Decoux氏作成による Ruby拡張ライブラリ
+    * [英辞郎]
+      Electronic Dictionary Project が制作する英語辞書データベース
+    * メモリーは5〜6M使用します 
+
+制約
+
+      日本語 eucコードしか対応していません. 
+
+動作確認
+
+    * linux : kterm, rxvt, gnome-terminal, mlterm, konsole, miniuni, teraterm
+
+      key情報ファイル名に$HOME/.rdic(rubyバージョン上3桁)/$TERM.keyを
+      使用 しています.たとえば gnome-terminalとmltermは$TERMが'xterm'
+      ですが、 keyのescape文字が異なります.そのため、交互に使うとイン
+      プット操作が効かなくなる キーがでてきます.このようなときは 
+      '-l','--learnkey'付きで rdicを起動しkey情報フ ァイルを再作成して
+      下さい.
+    * PenIII 500Mhz 320Mb な環境でしかテストしていません. 
+
+インストール
+
+    * 以下の要領でインストールして下さい.
+
+      rdicには 自動検索機能 Xselection拡張ライブラリーが同梱されています.
+
+% ruby extconf.rb
+% make
+# make install
+	
+
+      このままでは、まだrdicは使えません。同梱の rdicを実行パスの通っ
+      たディレクトリーにcopyして下さい。
+
+      rdic の1行目は #!/usr/bin/env ruby になっています.そのままでも使
+      えると思いますが、 #!/usr/local/bin/ruby -Ke や　#!/usr/bin/ruby
+      -Ke など rubyの場所を指定されることをおすすめします.
+
+辞書のインストール
+
+    * アルク web ページ風レイアウトの場合
+
+      同梱の cnv2alc.rbにより英辞郎 sjisテキストデータを eucコード及び 
+      アルク風レイアウトに変換し、sortします.
+
+% ruby -Ke cnv2alc.rb EIJIRO52.TXT | sort -k1,1 -t: -f > EIJIRO52.euc
+% ruby -Ke cnv2alc.rb RYAKU52.TXT  | sort -k1,1 -t: -f > RYAKU52.euc
+% ruby -Ke cnv2alc.rb OTOJIRO.TXT  | sort -k1,1 -t: -f > OTOJIRO.euc
+% ruby -Ke cnv2alc.rb WAEIJI52.TXT | sort -k1,1 -t: -f > WAEIJI52.euc
+	
+
+    * PDIC風レイアウトの場合
+
+      同梱の cnv2rdic.rbにより英辞郎 sjisテキストデータを eucコード及
+      び PDIC風レイアウトに変換し、sortします.
+
+% ruby -Ke cnv2rdic.rb EIJIRO52.TXT | sort -k1,1 -t: -f > EIJIRO52.euc
+% ruby -Ke cnv2rdic.rb RYAKU52.TXT  | sort -k1,1 -t: -f > RYAKU52.euc
+% ruby -Ke cnv2rdic.rb OTOJIRO.TXT  | sort -k1,1 -t: -f > OTOJIRO.euc
+% ruby -Ke cnv2rdic.rb WAEIJI52.TXT | sort -k1,1 -t: -f > WAEIJI52.euc
+	
+
+rubyの -Ke, sortの-k1,1 -t: -f を必ず指定してください. 変換には英辞郎、
+和英辞郎ともに約8分(penIII 500)かかりました.
+
+実行方法
+
+同梱の rdicを実行パスの通ったディレクトリーに置き、お好みの端末で
+
+% rdic EIJIRO52.euc RYAKU52.euc OTOJIRO.euc WAEIJI52.euc
+    
+
+rdic の1行目は #!/usr/bin/env ruby になっていま
+す. #!/usr/local/bin/ruby -Ke や　#!/usr/bin/ruby -Ke など rubyの場所
+を指定されることをおすすめします.
+
+表示されるキー名に対応するキーを押下後、enterを押してください
+insert: ^[[2~
+delete: ^[[3~
+home: ^[[1~
+ :
+F12:
+    
+
+初めての端末で実行したとき、上の表示のように、数種類の keyの入力を求め
+られます. プロンプトに表示される keyを押下して enterを押して下さ
+い. (-l or --learnkey指定で再入力可能です)
+
+コマンドラインオプション
+
+使用法: rdic [option...] 辞書ファイル...
+
+Options:
+-x --noselection        自動検索しない
+      　　　　　　　　  →X環境にない端末使用時に使用する
+   --interval=second    自動検索する間隔秒を変更する
+  　　　　　　　　　  　→例）--interval=0.1
+-l --learnkey           キー情報ファイルを再作成する
+-p --noprefix           プレフィックスを表示しない
+-b --bold               見出し語をBOLD表示する - ruby1.8 以上が必用 -
+-r --reverse            先頭見出し語をREVERSE表示する
+   --indent=column      インデントする桁数を指定する
+   --prefix=string      プレフィックスを指定
+   --separator=string   セパレータを指定
+   --config=file        初期設定ファイル名を指定する
+   --history=file       ヒストリーファイル名を指定する
+-h --help               このヘルプを表示して終了
+-v --version            バージョン番号を表示して終了
+
+Defaults:
+自動検索の間隔は   0.3秒
+インデントは       1
+プレフィックスは   "■" 
+セパレータは       " : "の英辞郎形式になっています.
+初期設定ファイルは $HOME/.rdic+RUBY_VERSION上3桁/rdic.conf
+ヒストリーファイルは $HOME/.rdic+RUBY_VERSION上3桁/history
+
+キー情報ファイルは $HOME/.rdic+RUBY_VERSION上3桁/$TERM.key が使われます
+    
+
+キーバインド
+
+[メインパネル]
+
+F1           ヘルプメニュー
+PGUP         前のページ
+PGDN         次のページ
+C-a, HOME    カーソルを先頭に
+C-e, END     カーソルを末尾へ  
+UP           前の行
+DOWN         次の行
+C-f, RIGHT   カーソルを右へ
+C-b, LEFT    カーソルを左へ
+C-p          前の単語を先頭に
+C-n          次の単語を先頭に
+Esc          全文字削除
+C-k          カーソル以降の全文字削除
+C-d  DELETE  カーソル上の文字削除
+Backspace    カーソル前の文字削除   
+INSERT       挿入/上書スイッチ
+C-i          大文字/小文字検索の区別スイッチ
+             →プロンプト表示が '>' <=> '=' に切り替わります
+             →プロンプト表示が '~' <=> '#' に切り替わります
+C-x          正規表現検索スイッチ
+             →プロンプト表示が '>' <=> '~' に切り替わり、
+             →プロンプト表示が '=' <=> '#' に切り替わり、
+             　自動検索およびインクリメンタルサーチは offされます
+               enterにより、検索を開始します
+             →検索進捗が %表示されます、また検索中にキー操作可能です
+             　一定量マッチしたら、時計表示を '*'に変えます、PGDN,DOWNで再開します
+Enter        正規表現検索開始（grepモード)/再検索開始（インクリメンタル・モード）
+M-Enter      連語あいまい検索開始
+C-o          用例表示のon/off
+             →offの時、画面右上に '-' が表示されます
+C-j          辞書選択パネルへ
+C-t          history表示パネルへ
+C-z          あいまい検索ワード表示パネルへ
+C-c          先頭文字を大文字に残りを小文字に
+C-u          小文字を大文字に
+C-l          大文字を小文字に
+C-r          再表示
+C-q          終了
+
+M--          前のhistoryを表示
+M-+          次のhistoryを表示
+M-C-p        前のhistoryの検索開始
+M-C-n        次のhistoryの検索開始
+M-.          連語あいまい検索時に対象語を右シフト
+M-,          連語あいまい検索時に対象語を左シフト
+
+M-c          先頭文字を大文字に残りを小文字に
+M-l          大文字を小文字に                 
+M-u          小文字を大文字に
+
+C-v          先頭の見出し語を読み上げ
+M-v          入力を読み上げ
+
+M-t          historyに先頭見出し語を登録
+
+[辞書選択パネル]
+
+F1           ヘルプメニュー
+enter        ボタンクリックと同じ動作
+             →[OK]で更新
+tab          次の入力域へカーソルを移動
+C-u          前の入力域へカーソルを移動
+UP           カーソルを前の行へ
+DOWN         カーソルを次の行へ
+RIGHT        カーソルを右へ
+LEFT         カーソルを左へ
+HOME         カーソルを先頭へ
+C-c          キャンセル（前のパネル）
+Esc          キャンセル（前のパネル）
+C-b          前のパネル
+C-q          終了
+
+[history表示パネル]
+
+f1              ヘルプメニュー
+C-b,escape      キャンセル
+C-s             ヒストリー検索保存
+C-v             ヒストリー検索保存表示
+C-k             削除
+C-c             全件削除
+C-u             アンドゥ
+pgup            前のページ
+pgdn            次のページ
+C-p             前の行
+C-n             次の行
+up,wheel_up     前の行
+down,wheel_down 次の行
+C-r             再表示
+enter           選択
+C-q             終了
+
+[あいまい検索ワード表示パネル]
+
+F1           ヘルプメニュー
+enter        検索開始 
+UP           カーソルを前の行へ
+DOWN         カーソルを次の行へ
+PGUP         前のページ
+PGDN         次のページ
+C-c          キャンセル（前のパネル）
+Esc          キャンセル（前のパネル）
+C-b          前のパネル
+C-q          終了
+    
+
+初期設定ファイル → [etc/rdic.conf.sample]
+
+    * 初期設定ファイル名
+
+          o デフォルトは $HOME/.rdic+RUBY_VERSION上3桁/rdic.confを使用します。
+            (例) ~/.rdic1.8/rdic.conf
+          o コマンドオプションに --config=ファイル名 を指定することで
+            デフォルト以外の初期設定ファイルを使用して rdicを起動するこ
+            とができます。
+
+    * 初期設定項目
+
+          o コマンドオプションで指定するもの(辞書ファイルを除く)と、そ
+            れ以外の変動項目が有ります。
+          o 詳細は、[etc/rdic.conf.sample] を参照下さい。 
+
+    * コマンドオプションと初期設定ファイルで同じ項目を設定した時の有効順
+
+      コマンドオプション ＞ --config=ファイル ＞ デフォルトファイル
+      の順に設定項目が決まります。
+    * 初期設定ファイルは特に必須というわけでは有りません。
+      ただし、見出し語読み上げコマンド等はここで指定する必要が有ります。 
+
+カスタマイズ
+
+    * keymapのカスタマイズ方法 → [README.keymap] [README.func] [etc/keymap.default]
+    * eliminateのカスタマイズ方法 → [README.eliminate] [etc/eliminate.default]
+
+      上記、カスタマイズに誤りがあると、エラーメッセージを標準出力に出
+      力するようになっています。
+
+見出し語の読み上げ
+
+    * 初期設定ファイルの指定
+
+      見出し語の読み上げは初期設定ファイルで指定された say_commandを実
+      行しているだけです。読み上げに festivalを使う場合は、初期設定ファ
+      イルに
+
+say_command = "festival --tts %s"
+	
+
+      を指定します。%sは見出し語が格納された一時ファイルに置き換えられます。
+    * キーバインド
+
+         1. C-v (先頭の見出し語を読み上げ)
+
+            画面に表示された一番先頭の見出し語を一時ファイルに格納し 
+            say_commandに渡します。
+
+         2. M-v (入力を読み上げ)
+
+            プロンプトに入力された文字を一時ファイルに格納し say_commandに渡します。
+    * テキスト読み上げソフト『festival』
+
+      私の ThinkPad T23 では、festivalのしゃべるスピードは早過ぎて使え
+      ないと思っていたのですが、解決策が[Festival FAQ]に有りました。
+
+          o [festival インストール メモ]
+
+            音をもっと大きくする方法、[MBROLA]を使う方法等簡単にまとめ
+            てみました。参考にして下さい。
+
+ホイールマウス
+
+ホイールマウスは、ktermで以下の設定した場合に限り、有効です。
+
+   1. .Xdefaults等に以下の文を追加し、xrdb -merge .Xdefaults でリソー
+      スを追加する。
+
+rdic*VT100.translations: #override\n\
+      <Btn4Down>,<Btn4Up>: string("\033[OA")\n\
+      <Btn5Down>,<Btn5Up>: string("\033[OB")
+    
+
+   2. -name rdic 付きで kterm -e rdic -l を実行する。
+      (-name rdic と リソースの rdic*VT100 が対応するようです。)
+
+% kterm -name rdic -e rdic -l
+	
+
+   3. 以下のようにプロンプトに答える。
+
+    :
+f11: ^[[23~
+f12: ^[[24~
+表示されるマウスアクションに対応するマウス操作後、enterを押してください
+(反応がない場合は、そのままenterを押してください；-)
+wheel_up: ^[[OA
+wheel_down: ^[[OB
+よろしいですか ? [y/n]: y
+key情報を /home/dave/.rdic1.6/kterm.key に出力します。よろしいですか ? [y/n]: y
+     :
+	
+
+      上記のように、wheel_up,wheel_down で escape sequence が入力されます。
+      これで、ホイールマウスが使えます。
+      -l オプションは次回からは必要ありません。
+
+      わたしの場合、KDEのアイコン(プロパティの実行コマンド)に
+
+kterm -name rdic -bg '#cccccc' +sb -e rdic /usr/share/dict/EIJIRO52.0213           (続く)
+/usr/share/dict/RYAKU52.alc /usr/share/dict/OTOJIRO.alc /usr/share/dict/WAEIJI52.alc
+	
+
+      として、起動させています。
+
+発音記号
+
+    * スクリーンショット
+
+          o 発音記号 (36.9KB) 
+
+   1. フォントのインストール
+
+      [JISX0213(所謂第3,4水準漢字)用bdfフォントのページ] から、フォン
+      トをダウンロードします。
+
+    たとえば、K14-1.bdf.gz を使う場合、
+
+% zcat K14-1.bdf.gz | bdftopcf -o K14-1.pcf
+% gzip K14-1.pcf
+# cp  K14-1.pcf.gz /usr/X11R6/lib/X11/fonts/misc/
+# cd /usr/X11R6/lib/X11/fonts/misc
+# mkfontdir .
+	
+
+      上記操作で、/usr/X11R6/lib/X11/fonts/misc/fonts.dir に
+
+K14-1.pcf.gz -misc-fixed-medium-r-normal--14-130-75-75-c-140-jisx0213.2000-1
+	
+
+      の行が追加されます。さらに、/usr/X11R6/lib/X11/fonts/misc/fonts.alias に
+
+K14-1        -misc-fixed-medium-r-normal--14-130-75-75-c-140-jisx0213.2000-1
+	
+
+      の行を手で追加し、以下のコマンドでフォントを有効にします。
+
+% xset fp rehash
+	
+
+   2. 辞書の発音記号をjisx0213に変換
+
+      変換スクリプト [cnv2jisx0213.rb] をダウンロードし、以下のコマン
+      ドを実行して下さい。
+
+          NOTE: 入力のEIJIRO52.eucは、rdic-0.0.7以降のcnv2alc.rbまたは
+                cnv2rdic.rbでインストールされている必要があります。
+
+% ruby cnv2jisx0213.rb < EIJIRO52.euc > EIJIRO52.0213
+	
+
+   3. 端末設定
+
+          * ktermの場合
+
+            patchが当たっていればそのままで表示されます。表示されない
+            場合は、-fkO K14-1 または、-fk K14-1 オプションを付けて起
+            動して下さい。
+            (plamo linux 3.0 附属の kterm では -fk ではなく -fkO とす
+            ることで表示できるそうです。)
+
+            宮崎さん、ご指摘ありがとうございました。(2003/05/05)
+
+          * rxvtの場合
+
+            -fm K14-1 オプションを付けて起動して下さい。
+
+          * gnome-terminalの場合
+
+            [gnome-terminalで発音記号を表示させる方法] を参照下さい。
+
+   4. 実行
+
+      上記端末で、
+
+% rdic EIJIRO52.0213
+	
+
+見出し語のボールド表示
+
+ruby1.8 以上の場合は -b(--bold)オプションを使用して起動することで見出
+し語はボールド表示されます。
+
+    * ktermの場合
+
+      [ここ]とか [ここ] を参照下さい。
+    * rxvtの場合
+
+      以下の設定を行い、-fn a14b オプションを付けて起動して下さい。
+
+/usr/X11R6/lib/X11/fonts/misc/fonts.alias に
+a14b         -misc-fixed-bold-r-normal--14-*-*-*-*-*-iso8859-1
+の行を手で追加し、以下のコマンドでフォントを有効にします。
+% xset fp rehash
+    
+
+端末問題 FAQ
+
+    * ktermで HOMEキーと ENDキーが同じ動きをするのですが…。
+
+      kterm 6.2.0では HOMEとENDが同じescape文字を返すようです. このよ
+      うなときは、.Xdefaults等に以下の文を追加して下さい.
+
+kterm*VT100.Translations: #override <Key>Home: string("\033[1~")\n\
+                                    <Key>End: string("\033[4~")
+	    
+
+      <Key>End: string("\033[4~)と最後の"が抜けているtypoがありました。
+
+      佐藤さん御指摘ありがとうございました。(2002/12/02)
+
+    * backspaceキーと deleteが同じ動きをするのですが…。
+
+          o ktermの場合
+
+            debian sid附属の/etc/X11/app-defaults/KTermでは
+
+*VT100.Translations: #override ~Shift ~Ctrl ~Meta <Key>Delete: string("\033[3~")\n\
+                               ~Shift ~Ctrl ~Meta <Key>Home: string("\033[1~")\n \
+                               ~Shift ~Ctrl ~Meta <Key>End: string("\033[4~")\n\
+                               ~Shift ~Ctrl ~Meta <Key>BackSpace: string("\177")
+	    
+
+            とBackSpaceに127が割り振られていました。以下のよう修正してみて下さい。
+
+*VT100.Translations: #override ~Shift ~Ctrl ~Meta <Key>Delete: string("\033[3~")\n\
+                               ~Shift ~Ctrl ~Meta <Key>Home: string("\033[1~")\n\
+                               ~Shift ~Ctrl ~Meta <Key>End: string("\033[4~")
+	    
+
+          o rxvtの場合
+
+            debian sidのkrxvtでBackSpaceに127が割り振られている問題。.
+            Xdefaults等に以下の文を追加して下さい。
+
+Rxvt.backspacekey: ^H
+	    
+
+      .Xdefaults等を書き変えた後は、-l or --learnkey指定でrdicを起動し
+      keyを再入力して下さい。
+
+    * Altキーが使えません…。
+
+          o ktermの場合
+
+            .Xdefaults等に以下の文を追加して下さい
+
+KTerm*eightBitInput: false
+	    
+
+          o rxvtの場合
+
+            .Xdefaults等に以下の文を追加して下さい
+
+Rxvt:meta8:false
+	    
+
+    * 日本語の自動検索が効きません…。
+
+      環境変数 LANGがja_JP.eucJPになっているかチェックして下さい.
+      TERM=xtermな端末ではセットされていないことがあるようです.
+
+感謝
+
+    * [Ruby] まつもとゆきひろ氏とその仲間のみなさん
+    * [英辞郎] 100万語を達成した Electronic Dictionary Project
+    * [MyD] 藤井 宏憲氏 Xselectionの元ネタです
+    * Mmap かの Guy Decoux氏 驚きの速さです
+    * [JTTui] Jakub Travnik氏 多くのコードをここから getしました
+    * [PDIC] TaN氏 linuxで動くPDICがほしくて作り始めました
+    * [Ando Kaoriさん] Vine Users MLで自動連語判別あいまい検索機能追加の切っ掛けを与えてくれました。 
+
+注意
+
+当プログラムにおいて発生したいかなる障害であろうとも、当方では一切の責任を負いません。
+全て自己責任で使用して下さい.
+Copyright
+
+It's free software (GPL).
+Feel free to send any comments to me. 
+                                                             http://www.yasgursfarm.us
+                                                      dave@yasgursfarm.us (Dave Scotto)

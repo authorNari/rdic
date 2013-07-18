@@ -1,0 +1,51 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html 
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>xselection.rd</title>
+</head>
+<body>
+<h1><a name="label:0" id="label:0">Xselection</a></h1><!-- RDLabel: "Xselection" -->
+<p>The Xselection class implement get String from X selection.</p>
+<h2><a name="label:1" id="label:1">Class Methods</a></h2><!-- RDLabel: "Class Methods" -->
+<p>new(display)</p>
+<pre>- Xselection.new(ENV["DISPLAY"])
+    normal return is nil
+    raise if illegal display</pre>
+<h2><a name="label:2" id="label:2">Methods</a></h2><!-- RDLabel: "Methods" -->
+<p>get()</p>
+<pre>- get()
+    return String if X selection has string
+    return nil if X selection is null</pre>
+<p>check()</p>
+<pre>- check()
+    return String if X selection is changed
+    return nil if X selection not changed or Xsellection is null</pre>
+<p>close()</p>
+<pre>- close()
+    close display</pre>
+<h2><a name="label:3" id="label:3">Sample</a></h2><!-- RDLabel: "Sample" -->
+<pre>require 'xselection'
+require 'xselection'
+require 'jcode'
+$KCODE = "e"
+
+raise "DISPLAY is not available." unless ENV["DISPLAY"]
+begin
+  x = Xselection.new(ENV["DISPLAY"])
+  loop do 
+    str = x.check()
+    p str if str
+    sleep(0.3)
+  end
+ensure
+  x.close()
+end</pre>
+<h2><a name="label:4" id="label:4">Nihongo</a></h2><!-- RDLabel: "Nihongo" -->
+<pre>- check $LANG is ja_JP.eucJP
+- set $KCODE=e or ruby -Ke option</pre>
+
+</body>
+</html>

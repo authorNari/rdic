@@ -1,0 +1,66 @@
+rdic のキーバインドについて               2003-03-09
+
+  ~/.rdic1.6/keymap にキーバインドを追加/削除できます。
+  
+   .rdic1.6の1.6はRubyのバージョンの上三桁です。
+   ~/.rdic1.6ディレクトリーはrdicを始めて実行した時に、
+   自動的に作成されます。
+
+  指定方法は、
+
+    addkey  キー  コマンド
+    delkey  キー
+
+  です。
+
+  例は keymap.default を見てください。(etc/keymap.default
+  には keymapを定義しない場合のデフォルト値が書かれていま
+  す。)
+  設定できるコマンドは README.func を見てください。
+
+  指定可能なキーは、
+  
+	Ctrl	: C-      (C- の後は小文字、@\]^_です。
+	                   大文字、数字はエラーになります。)
+	Alt	: M-      
+	INSERT	: insert
+	DELETE	: delete
+	HOME  	: home
+	END   	: end
+	PGUP  	: pgup
+	PGDN  	: pgdn
+	UP    	: up
+	DOWN  	: down
+	RIGHT 	: right
+	LEFT  	: left
+	F1    	: f1
+	F2    	: f2
+	F3    	: f3
+	F4    	: f4
+	F5    	: f5
+	F6    	: f6
+	F7    	: f7
+	F8    	: f8
+	F9    	: f9
+	F10   	: f10
+	F11   	: f11
+	F12   	: f12
+
+
+
+使用可能な Ctrl Alt キー
+
+C-_ C-@ C-a C-b C-c C-d C-e C-f C-g C-i C-j C-k C-l C-n
+C-o C-p C-q C-r C-s C-t C-u C-v C-w C-x C-y C-z C-\ C-] C-^
+
+M-C-_ M-C-@ M-C-a M-C-b M-C-c M-C-d M-C-e M-C-f M-C-g
+M-backspace M-C-i M-C-j M-C-k M-C-l M-enter M-C-n M-C-o M-C-p
+M-C-q M-C-r M-C-s M-C-t M-C-u M-C-v M-C-w M-C-x M-C-y M-C-z
+M-C-\ M-C-] M-C-^
+
+M- M-! M-" M-# M-$ M-% M-& M-' M-( M-) M-* M-+ M-, M-- M-. M-/
+M-0 M-1 M-2 M-3 M-4 M-5 M-6 M-7 M-8 M-9 M-: M-; M-< M-= M-> M-?
+M-@ M-A M-B M-C M-D M-E M-F M-G M-H M-I M-J M-K M-L M-M M-N M-O
+M-P M-Q M-R M-S M-T M-U M-V M-W M-X M-Y M-Z M-\ M-] M-^ M-_ M-`
+M-a M-b M-c M-d M-e M-f M-g M-h M-i M-j M-k M-l M-m M-n M-o M-p
+M-q M-r M-s M-t M-u M-v M-w M-x M-y M-z M-{ M-| M-} M-~

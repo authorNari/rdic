@@ -1,0 +1,52 @@
+=begin
+= Xselection
+
+The Xselection class implement get String from X selection.
+
+== Class Methods
+
+new(display)
+  - Xselection.new(ENV["DISPLAY"])
+      正常戻り値は nil
+      不正な DISPLAYが指定されると RuntimeErrorを発生させます
+
+== Methods
+
+get()
+  - get()
+      selectionに文字列があればそれを返します
+      selectionに文字列が無い場合、nilを返します
+
+check()
+  - check()
+      selectionの内容が前回 getした文字列と変わっていればそれを返します
+      selectionの内容が前回 getした文字列と同じ時は nilを返します
+
+close()
+  - close()
+      displayを closeします
+      
+== Sample
+
+  require 'xselection'
+  require 'jcode'
+  $KCODE = "e"
+  
+  raise "DISPLAY is not available." unless ENV["DISPLAY"]
+  begin
+    x = Xselection.new(ENV["DISPLAY"])
+    loop do 
+      str = x.check()
+      p str if str
+      sleep(0.3)
+    end
+  ensure
+    x.close()
+  end
+
+== 日本語が getできない時
+
+  - 環境変数 LANGがja_JP.eucJPになっていることをチェックして下さい
+  - $KCODE=e or ruby -Ke option を指定して下さい
+
+=end

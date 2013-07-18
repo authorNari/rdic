@@ -1,0 +1,254 @@
+0.1.8 (2005-04-22)
+
+	* rdic :
+
+	・不規則動詞のハッシュに
+	"belying" => "belie",
+	"caddying" => "caddie",
+	"dying" => "die",
+	"lying" => "lie",
+	"tying" => "tie",
+	"underlying" => "underlie",
+	"untying" => "untie",
+	"vying" => "vie",
+	"bivouacked" => "bivouac", "bivouacking" => "bivouac",
+	"zincked" => "zinc", "zincking" => "zinc",
+	"frolicked" => "frolic", "frolicking" => "frolic",
+	"magicked" => "magic", "magicking" => "magic",
+	"mimicked" => "mimic", "mimicking" => "mimic",
+	"panicked" => "panic", "panicking" => "panic",
+	"picnicked" => "picnic", "picnicking" => "picnic",
+	"trafficked" => "traffic", "trafficking" => "traffic",
+	 を追加
+
+	・正規表現検索を高速にした
+	 (というか今までが遅すぎただけです)
+
+0.1.7 (2004-11-17)
+
+	* cnv2alc.rb :
+
+	・英辞郎 Ver.80 データ仕様の一部変更に対応
+
+	* cnv2rdic.rb :
+
+	・英辞郎 Ver.80 データ仕様の一部変更に対応
+	
+	* rdic :
+
+	・バージョン表示のみ変更
+
+0.1.6 (2004-10-04)
+
+	* rdic :
+
+	・辞書選択パネルが開かないバグ修正
+	・ruby 1.8.1からyieldの仕様が変更(解除)対応。
+	・NetBSD/kterm の日本語入力不具合対応
+	・ヒストリーをファイルに格納時(C-s)、上書きプロンプトにファイル名を表示
+
+0.1.5 (2003-11-26)
+
+	* rdic :
+
+	・必要のないファイル名の補完のバグ修正
+	
+0.1.4 (2003-11-24)
+
+	* rdic :
+
+	・上書き時にダブルワードを判定するように修正。
+	・backspaceで消した単語をヒストリーに残らないようにした。
+	・M-tで先頭表示語をヒストリーに追加するようにした。
+	・主パネル以外で redraw時に allow_size? を呼ぶよう修正。
+	・ruby 1.8.1からyieldの仕様が変更対応。
+	  sheepmanさんパッチありがとうございました。
+	  http://www.yasgursfarm.us/rdic/cbbs/cbbs.cgi?mode=one&namber=97&type=0&space=0&no=0
+	・起動オプションに -r --reverse (先頭見出し語をREVERSE表示する)を追加。
+	  デフォルトの先頭見出し語をREVERSE表示をやめた。
+	・C-kでヒストリー一覧からの行削除を可能にした。
+	・C-cでヒストリー一覧からの全行削除を可能にした。
+	・C-uでヒストリー一覧のアンドゥを可能にした。
+	・C-sでヒストリー一覧の単語と意味をファイルに保存可能にした。
+	・C-vでヒストリー一覧の単語と意味をファイルに保存 & 表示を可能にした。
+	・ヒストリーをファイルに格納するようにした。
+	・起動オプションに --history= (ヒストリーファイルを設定)を追加。
+	・messageboxやtextfield を作ってみた
+	
+	* etc/rdic.conf.sample :
+
+	・#reverse = trueを追加
+	・view_command = 'nohup mozilla %s > /dev/null &'
+		
+	* README.func ：
+
+	・ push_historyを追加
+
+	* etc/keymap.default :
+
+	・addkey M-t push_historyの追加
+		
+0.1.3 (2003-09-15)
+
+	* rdic :
+
+	・見出し語中の'-'対応
+	・あいまい検索時、英字と日本語を分解するようにした
+	・ヘルプメニューを追加
+	・見出し語読み上げインターフェースを追加
+	・初期設定ファイルから起動オプションを設定可能にした
+
+	* etc/rdic.conf.sample :
+
+	・追加
+
+
+0.1.2 (2003-08-10)
+
+	* rdic :
+
+	・next_fuzzy, prev_fuzzy 時に throw :stopfuzzy で落ちるバグ修正
+	・next_line, prev_line 時に正規表現強調表示位置がずれるバグ修正
+	・xxxx_history_search_start 時のバグ修正
+	・-x オプション使用起動時に落ちるバグ修正
+	  うえちさん(http://u.dhis.portside.net/)報告ありがとうございました。
+	・ヒストリー表示パネル(C-t)の追加
+	・あいまい検索ワード表示パネル(C-z)の追加
+
+	* xselection.c :
+
+	・警告メッセージ対応のみ
+
+	* README.func ：
+
+	・switch_historypane, switch_fuzzypane追加
+	
+
+0.1.1 (2003-07-09)
+
+	* rdic :
+
+	・warning: public_instance_methods parameter will default to 'true' after 1.8.1
+	  public_instance_methods(true)
+          http://www.rubyist.net/~matz/?date=20030520#p03 1.8仕様への移行パス
+	・連語検索用の正規表現に', be an?'を含めた
+	・History検索開始機能の追加(M-C-p,M-C-n)
+	・GC.startを一箇所追加
+	・見出し語のボールド表示オプション(-b --bold)の追加
+	・インデント表示オプション(--indent=nn)の追加
+	・リスト表示インデント機能を追加
+	・行頭禁則処理を追加
+
+0.1.0 (2003-05-06)
+
+	* rdic :
+
+	・初期画面でページ操作した時に rdic が落ちるバグの修正。
+	・ruby1.8 以上で正規表現マッチ部分を下線表示する。
+	・連語検索用の正規表現に', a',', the'を含めた
+	・大幅なリファクタリング
+
+	* xselection.c :
+
+	・emacs でもセレクションを可能にするため、ターゲットを以下の順にした。
+	  "UTF8_STRING", "COMPOUND_TEXT", " TEXT", "STRING"
+	
+	* cnv2rdic.rb :
+
+	・用例の表示 on/off が效かないデータが生成されるバグ修正。
+
+	* README.keymap
+
+	・使用可能な C-,M-,C-M- キーの修正
+	
+0.0.9 (2003-03-09)
+
+	* rdic :
+
+	・比較級、最上級のstem対応
+	・単語接尾部 xe,ze,oe のstemming修正
+	・単語接尾部 同一語(ll,ss等) のstemming修正
+	・History機能の追加(M--,M-+)
+	・連語あいまい検索開始機能の追加(M-Enter)
+	・連語あいまい検索時の対象語の右左シフト機能の追加(M-.,M-,)
+	・プレフィックス非表示オプション(-p --noprefix)の追加
+	
+	* README.func
+	
+	・fuzzy_search_start,prev_history,next_history,prev_fuzzy,next_fuzzy 追加
+
+	* README.keymap
+
+	・使用可能な C-,M-,C-M- キーの追加
+
+
+0.0.8 (2003-02-22)
+
+	* rdic :
+
+	・wheel mouse に対応した(kterm のみ)
+	  kterm の resource に
+	  rdic*VT100.translations: #override\n\
+     		<Btn4Down>,<Btn4Up>: string("\033[OA")\n\
+      		<Btn5Down>,<Btn5Up>: string("\033[OB")
+	  を定義し、
+  	  kterm -name rdic -e rdic EIJIRO52.0213 RYAKU52.alc OTOJIRO.alc WAEIJI52.alc で起動
+
+	* cnv2jisx0213.rb
+	
+	・追加	
+
+0.0.7 (2003-02-10)
+
+	* rdic :
+
+	・大量範囲選択後の連語検索後、たまにrdicが落ちる問題を修正
+	・keymapをカストマイズ可能にした
+	・連語検索後に個々の単語を検索するが、検索させたくない単語をカスタマイズ可能にした
+	・連語作成時に人称主格/目的格をoneに置き換えるのを止めた
+	・連語検索用の正規表現に', be'を含めた
+	・単語接尾部 eed のstemming時にstemming前の単語返すよう修正
+	・単語接尾部 e のstemming時に返す単語順を修正
+
+	* cnv2alc.rb cnv2rdic.rb :
+
+	・sjis機種依存文字を代用文字で変換するよう修正
+	  (発音記号に'∫'を使ったりした)
+
+	* README.keymap
+	* README.func
+	* README.eliminate
+	* etc/keymap.default
+	* etc/eliminate.default
+
+	・追加
+	 
+
+0.0.6 (2003-01-26)
+
+	・自動検索時に連語の自動判別およびあいまい検索機能を追加
+
+0.0.5 (2002-12-14)
+
+	・正規表現検索時に大文字小文字の区別ができるようにした
+	・禁則処理の修正
+	・(xselection.c の修正と cnv2alc.rb の追加)
+
+0.0.4 (2002-09-28)
+
+	・delete keyが無視されていた bug修正
+	・辞書選択パネルをもうける
+	・無駄なコードの削除
+
+0.0.3 (2002-09-21)
+	
+	・oikosi_kinsiのバグ修正
+	
+0.0.2 (2002-09-20)
+	
+	・oikosi_kinsiフラグをもうける
+	
+0.0.1 (2002-09-19)
+	
+	・公開
+

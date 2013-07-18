@@ -1,0 +1,73 @@
+# A sample of ~/.rdic1.6/keymap (default)
+#
+# Ctrl  : C-
+# Alt	: M-
+# INSERT: insert
+# DELETE: delete
+# HOME  : home
+# END   : end
+# PGUP  : pgup
+# PGDN  : pgdn
+# UP    : up
+# DOWN  : down
+# RIGHT : right
+# LEFT  : left
+# F1    : f1
+# F2    : f2
+# F3    : f3
+# F4    : f4
+# F5    : f5
+# F6    : f6
+# F7    : f7
+# F8    : f8
+# F9    : f9
+# F10   : f10
+# F11   : f11
+# F12   : f12
+
+addkey	f1	help_menu
+addkey 	C-a 	movetosol
+addkey	C-b 	left
+addkey	C-c 	capitalize
+addkey	C-d 	delete
+addkey	C-e 	movetoeol
+addkey	C-f 	right
+addkey	C-i 	switch_case
+addkey	C-k 	killtoeol
+addkey	C-l 	downcase
+addkey	C-n 	next_word
+addkey	C-o 	switch_example_display
+addkey	C-p 	prev_word
+addkey	C-q 	quit
+addkey	C-r 	redraw
+addkey	C-u 	upcase
+addkey	C-x 	switch_grep
+addkey	C-j 	switch_set_pane
+addkey  C-t	switch_historypane
+addkey  C-z	switch_fuzzypane
+addkey	enter	search_start
+addkey  M-enter	fuzzy_search_start
+addkey	backspace backspace
+addkey	escape	erase
+addkey	insert 	switch_insert
+addkey	delete  delete
+addkey	home    movetosol
+addkey	end     movetoeol
+addkey	pgup    prev_page
+addkey	pgdn    next_page
+addkey	up      prev_line
+addkey	down    next_line
+addkey	right   right
+addkey	left    left
+addkey	M-c  	capitalize
+addkey 	M-l  	downcase
+addkey 	M-u  	upcase
+addkey  M--  	prev_history
+addkey  M-+	next_history
+addkey  M-.	next_fuzzy
+addkey  M-,	prev_fuzzy
+addkey  M-C-n   next_history_search_start
+addkey  M-C-p   prev_history_search_start
+addkey	C-v	say_top_word
+addkey	M-v	say_input_word
+addkey  M-t	push_history

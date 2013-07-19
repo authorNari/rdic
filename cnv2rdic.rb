@@ -1,7 +1,3 @@
-#!/usr/local/bin/ruby -Ke
-
-DATE = "20041116"
-
 # 全角記号の半角化と pdic風レイアウト変換
 def full2half(s)
   if s
@@ -71,26 +67,24 @@ def kishu_izon(s)
   s.gsub!(/\x87\x5d/s, "X")
   s.gsub!(/\x87\x70/s, "cm")
   s.gsub!(/\xee\x9d/s, CNV_CHR2)
-  s.gsub!(/#{"[\x84\xbf-\x88\x9d]"}/s, CNV_CHR)
+  s.gsub!(/[\x84\xbf-\x88\x9d]/s, CNV_CHR)
   return s
 end
 
-require 'kconv'
-require "jcode"
 require "nkf"
-$KCODE = "EUC"
 
-CNV_CHR = Kconv::kconv('〓', Kconv::SJIS, Kconv::EUC)
+CNV_CHR = '〓'
 # とう小平　語彙の先頭あってbinary検索不可
-CNV_CHR2 = Kconv::kconv('とう', Kconv::SJIS, Kconv::EUC)
-CNV_CHR3 = Kconv::kconv('∫', Kconv::SJIS, Kconv::EUC)
+CNV_CHR2 = 'とう'
+CNV_CHR3 = '∫'
 
-sold = full2half(NKF.nkf('-S -e -Lu', kishu_izon(ARGF.gets)))
+ARGF.set_encoding('sjis')
+sold = full2half(NKF.nkf('-S -w -Lu', kishu_izon(ARGF.gets)))
 sold =~ / : /
 midashi_old = $`
 i = 0
 while line = ARGF.gets
-  s = full2half(NKF.nkf('-S -e -Lu', kishu_izon(line)))
+  s = full2half(NKF.nkf('-S -w -Lu', kishu_izon(line)))
   if s =~ / : /
     midashi = $`
     imi = $'

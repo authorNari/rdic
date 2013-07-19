@@ -2,3 +2,4 @@ Makefile
 mkmf.log
 xselection.o
 xselection.so
+*.utf

@@ -1,12 +1,10 @@
 #!/usr/bin/env ruby
-# -*- coding: euc-jp -*-
-#
-#
-#
-#
-#
 
-RDIC_VERSION = "0.1.8 (20050422)"
+RDIC_VERSION = "0.1.9 (20120718)"
+
+require 'logger'
+
+RDIC_LOGGER = Logger.new('/tmp/rdic.log')
 
 module Stem
   extend self
@@ -513,14 +511,15 @@ module Termkey
     } if yn =~ /^y$/i
     GC.start
   rescue
-    print $!
-    print "Warning! Cannot store keys in #{path+file}\n"
+    puts $!
+    puts $!.backtrace
+    puts "Warning! Cannot store keys in #{path.to_s+file.to_s}\n"
     sleep 4
   end
   
   def set_key_tbl
     KEY_TBL[0.chr]  = "C-@"
-    (1..26).each {|x| KEY_TBL[x.chr] = "C-"+(x+?a-1).chr}
+    (1..26).each {|x| KEY_TBL[x.chr] = "C-" + (x+(?a).bytes.first-1).chr}
     KEY_TBL[27.chr] = "escape"
     KEY_TBL[28.chr] = "C-\\"
     KEY_TBL[29.chr] = "C-]"
@@ -771,54 +770,54 @@ module RdicKey
   ]
 
   DEFAULT_KEY_BIND = {
-    "f1"  => "help_menu",
-    "C-a" => "movetosol",
-    "C-b" => "left",
-    "C-c" => "capitalize",
-    "C-d" => "delete",
-    "C-e" => "movetoeol",
-    "C-f" => "right",
-    "C-i" => "switch_case",
-    "C-k" => "killtoeol",
-    "C-l" => "downcase",
-    "C-n" => "next_word",
-    "C-o" => "switch_example_display",
-    "C-p" => "prev_word",
-    "C-q" => "quit",
-    "C-r" => "redraw",
-    "C-u" => "upcase",
-    "C-x" => "switch_grep",
-    "C-j" => "switch_set_pane",
-    "C-t" => "switch_historypane",
-    "M-t" => "push_history",
-    "C-z" => "switch_fuzzypane",
-    "C-v" => "say_top_word",
-    "M-v" => "say_input_word",
-    "enter"  => "search_start",
-    "M-enter"  => "fuzzy_search_start",
-    "backspace" => "backspace",
-    "escape"   => "erase",
-    TERM_INSERT => "switch_insert",
-    TERM_DELETE => "delete",
-    TERM_HOME   => "movetosol",
-    TERM_END    => "movetoeol",
-    TERM_PGUP   => "prev_page",
-    TERM_PGDN   => "next_page",
-    TERM_UP     => "prev_line",
-    TERM_DOWN   => "next_line",
-    TERM_RIGHT  => "right",
-    TERM_LEFT   => "left",
-    MOUSE_WHEEL_UP     => "prev_line",
-    MOUSE_WHEEL_DOWN   => "next_line",
-    "M-c" => "capitalize",
-    "M-l" => "downcase",
-    "M-u" => "upcase",
-    "M--" => "prev_history",
-    "M-+" => "next_history",
-    "M-." => "next_fuzzy",
-    "M-," => "prev_fuzzy",
-    "M-C-n" => "next_history_search_start",
-    "M-C-p" => "prev_history_search_start"
+    "f1"  => :help_menu,
+    "C-a" => :movetosol,
+    "C-b" => :left,
+    "C-c" => :capitalize,
+    "C-d" => :delete,
+    "C-e" => :movetoeol,
+    "C-f" => :right,
+    "C-i" => :switch_case,
+    "C-k" => :killtoeol,
+    "C-l" => :downcase,
+    "C-n" => :next_word,
+    "C-o" => :switch_example_display,
+    "C-p" => :prev_word,
+    "C-q" => :quit,
+    "C-r" => :redraw,
+    "C-u" => :upcase,
+    "C-x" => :switch_grep,
+    "C-j" => :switch_set_pane,
+    "C-t" => :switch_historypane,
+    "M-t" => :push_history,
+    "C-z" => :switch_fuzzypane,
+    "C-v" => :say_top_word,
+    "M-v" => :say_input_word,
+    "enter"  => :search_start,
+    "M-enter"  => :fuzzy_search_start,
+    "backspace" => :backspace,
+    "escape"   => :erase,
+    TERM_INSERT => :switch_insert,
+    TERM_DELETE => :delete,
+    TERM_HOME   => :movetosol,
+    TERM_END    => :movetoeol,
+    TERM_PGUP   => :prev_page,
+    TERM_PGDN   => :next_page,
+    TERM_UP     => :prev_line,
+    TERM_DOWN   => :next_line,
+    TERM_RIGHT  => :right,
+    TERM_LEFT   => :left,
+    MOUSE_WHEEL_UP     => :prev_line,
+    MOUSE_WHEEL_DOWN   => :next_line,
+    "M-c" => :capitalize,
+    "M-l" => :downcase,
+    "M-u" => :upcase,
+    "M--" => :prev_history,
+    "M-+" => :next_history,
+    "M-." => :next_fuzzy,
+    "M-," => :prev_fuzzy,
+    "M-C-n" => :next_history_search_start,
+    "M-C-p" => :prev_history_search_star
   }
   
   def key_bind(key)
@@ -836,14 +835,14 @@ module RdicKey
   end
       
   def valid_function?(function)
-    RdicViewControll.public_instance_methods(true).include?(function)
+    RdicViewControll.public_instance_methods(true).include?(function.to_sym)
   end
   
   def add_keybind(key,function)
-    unless RdicViewControll.public_instance_methods(true).include?(function)
+    unless RdicViewControll.public_instance_methods(true).include?(function.to_sym)
       raise "method name '#{function}' is invalid."
     end
-    DEFAULT_KEY_BIND[key] = function
+    DEFAULT_KEY_BIND[key] = function.to_sym
   end
   
   def delete_keybind(key)
@@ -861,7 +860,7 @@ module RdicViewCommon
   def delegete_to_ctl(method_name,input_chr = nil)
     if @ctl.class == Array
       @ctl.each{|ctl|
-        if ctl.public_methods().include?(method_name)
+        if ctl.public_methods.include?(method_name)
           if input_chr
             ctl.method(method_name).call(input_chr)
           else
@@ -1060,8 +1059,6 @@ end
 
 class MmapDictionary
 
-  require 'mmap'
-
   AVG_WORD_LENGTH = 50
   AVG_LINE_LENGTH = 500
   SKIP_COLS = AVG_LINE_LENGTH # / 2 
@@ -1074,9 +1071,8 @@ class MmapDictionary
   
   def initialize(dicfile, prefix, sep)
     @dicfile = dicfile
-    @is_open = false
-    open()
     @prefix = prefix
+    @dictionary = File.read(@dicfile)
     @separator = sep
     @separator_length = @separator.length
     @dictionary_length = @dictionary.length
@@ -1085,27 +1081,8 @@ class MmapDictionary
   end
 
   private
-  def open
-    unless @is_open
-      @dictionary = Mmap.new(@dicfile, "r", Mmap::MAP_SHARED)
-      @is_open = true
-    end
-  end
-  
-  private
-  def close
-    if @is_open
-      @dictionary.munmap
-      @dictionary = nil
-      @is_open = false
-    end
-  end
-  
-  private
   def gc
-    close()
     GC.start
-    open()
   end
   
   public 
@@ -1122,16 +1099,14 @@ class MmapDictionary
 
   public 
   def lookup_incremental_each(word, case_sense=false)
+    #RDIC_LOGGER.debug("lookup_incremental_each: word=<#{word}>")
     @case_sensitive = case_sense
     look_each(word) {|line| yield line}
   end
   
   public
   def grep_each(reg)
-    open()
-    @dictionary.madvise(Mmap::MADV_SEQUENTIAL)
     grep_match_each(reg) {|line| yield line }
-    close()
   end
 
   private
@@ -1139,22 +1114,19 @@ class MmapDictionary
     # reg_ary    == nil     : incremental lookup
     # reg_ary[0] == ''      : complete match
     # reg_ary[0].length > 0 : complete match & regexp
-    open()
-    @dictionary.madvise(Mmap::MADV_RANDOM)
     word_with_prefix = @prefix + word
     @word_length = word_with_prefix.length
     left = binary_search(word_with_prefix)
     wk_left = linear_rsearch(left, word_with_prefix)
     left = (wk_left) ? wk_left : linear_search(left, word_with_prefix, reg_ary)
+    #RDIC_LOGGER.debug("lookup_each: word=<#{word}>, reg_ary=<#{reg_ary}>, left=<#{left}>, word/w_p=<#{word_with_prefix}>")
     if left
-      @dictionary.madvise(Mmap::MADV_SEQUENTIAL)
       unless reg_ary
         head_match_each(left, word_with_prefix) {|line| yield line }
       else
         head_match_each_with_reg_ary(left, word_with_prefix, reg_ary) {|line| yield line }
       end
     end
-    close()
   end
 
   private
@@ -1279,14 +1251,17 @@ class MmapDictionary
       reg2 = Regexp.new('^'+reg)
       alloc_len = LOOK_ALLOC_LENGTH
       catch :stoploop do
+        #RDIC_LOGGER.debug("head_match_each: start_point=<#{start_point}>, word=<#{word}>, alloc_len=<#{alloc_len}>, @dictionary_length=<#{@dictionary_length}>")
         loop {
           until ((start_point + alloc_len) >= @dictionary_length)
             break if @dictionary[start_point,alloc_len].index(LF)
             alloc_len += AVG_LINE_LENGTH 
           end  
-          @dictionary[start_point,alloc_len].each { |line|
+          @dictionary[start_point,alloc_len].each_line { |line|
             # AVG_LINE_LENGTHによって最後に切られたline　以外
+            #RDIC_LOGGER.debug("head_match_each(loop_pre): line=<#{line}>")
             if line.index(LF) && line.index(@separator)
+              #RDIC_LOGGER.debug("head_match_each(loop): line=<#{line}>, reg1=<#{reg1}>")
               if reg1 =~ line  
                 start_point += line.length
                 if @case_sensitive
@@ -1304,7 +1279,6 @@ class MmapDictionary
             end
           }
           gc()
-          @dictionary.madvise(Mmap::MADV_SEQUENTIAL)
           break if start_point >= @dictionary_length
         }
       end
@@ -1340,12 +1314,14 @@ class MmapDictionary
       }
       alloc_len = LOOK_ALLOC_LENGTH
       catch :stoploop do
+        #RDIC_LOGGER.debug("head_match_each_with_reg_ary: start_point=<#{start_point}>, word=<#{word}>, alloc_len=<#{reg_ary}>")
         loop {
           until ((start_point + alloc_len) >= @dictionary_length)
             break if @dictionary[start_point,alloc_len].index(LF)
             alloc_len += AVG_LINE_LENGTH 
           end  
-          @dictionary[start_point,alloc_len].each { |line|
+          @dictionary[start_point,alloc_len].each_line { |line|
+            #RDIC_LOGGER.debug("head_match_each_with_reg_ary: line=<#{line}>, reg1=<#{reg1}>")
             # AVG_LINE_LENGTHによって最後に切られたline　以外
             if line.index(LF) && line.index(@separator)
               if reg1 =~ line  
@@ -1364,7 +1340,6 @@ class MmapDictionary
             end
           }
           gc()
-          @dictionary.madvise(Mmap::MADV_SEQUENTIAL)
           break if start_point >= @dictionary_length
         }
       end
@@ -1390,7 +1365,6 @@ class MmapDictionary
         end
         if ((gc_control += 1) % GREP_GC_PAR_COUNT) == 0
           gc()
-          @dictionary.madvise(Mmap::MADV_SEQUENTIAL)
         end
       else
         break
@@ -1605,7 +1579,7 @@ class RdicHistory
     return -1 unless astr
     return -1 unless bstr
     # thanks kzysさん
-    if bstr =~ /^#{Regexp.escape(astr)}/n
+    if bstr =~ /^#{Regexp.escape(astr)}/
       return $~.post_match.scan(/./).length
     end
     return -1
@@ -1862,6 +1836,7 @@ class RdicViewControll
   end
   
   def lookup_proc(id)
+    #RDIC_LOGGER.debug("lookup_proc: @grep_mode=<#{@grep_mode}>, ")
     @fuzzy_start_pos = -1
     @fuzzy_words = []
     case id
@@ -1877,6 +1852,7 @@ class RdicViewControll
   end
   
   def lookup_fuzzy
+    #RDIC_LOGGER.debug("lookup_fuzzy: @word=<#{@word}>, enc=<#{@word.encoding}>")
     @fuzzy_words = @word.scan(/[A-Za-z_\d'-]+|[^\Wa-zA-Z_\dを#{RdicMain::KIGOU}]+/) # '
     @fuzzy_pos_ary = str_pos_ary(@word)
     @lookup_cnt = 0
@@ -1889,7 +1865,7 @@ class RdicViewControll
           all_word_lookup(@fuzzy_words)
         end
       end
-      RdicMain::put_msg(["incremental_search_start", @word]) if @lookup_cnt == 0
+      RdicMain::put_msg([:incremental_search_start, @word]) if @lookup_cnt == 0
     end
   end
   
@@ -2065,6 +2041,7 @@ class RdicViewControll
     look_progress_stop()
     look_progress_start()
     look_each(word, reg_ary, case_sensitive?) {|line|
+      #RDIC_LOGGER.debug("lookup_thread_impl: detected_line=<#{line}>")
       if (@lookup_cnt += 1) == 1
         @rdicmodel.clear
         @last_founded = true
@@ -2453,7 +2430,7 @@ class RdicViewControll
   end
 
   def movetoeol 
-    @cursor = @word.length 
+    @cursor = @word.bytesize
   end
   
   def killtoeol 
@@ -2465,10 +2442,8 @@ class RdicViewControll
 
   def right 
     get_cursor_from_array()
-    if @cursor < @word.length
-      #n = (@word[@cursor,1] =~ /\w/ || @word[@cursor,1] =~ /\W/) ? 1 : 2
-      n = (32..126).include?(@word[@cursor]) ? 1 : 2
-      n.times {@cursor += 1}
+    if @cursor < @word.bytesize
+      char_width(@word[@cursor]).times {@cursor += 1}
     else
       Curses.beep
     end
@@ -2479,18 +2454,14 @@ class RdicViewControll
     if @cursor == 0
       Curses.beep
     else
-      #n = (@word[@cursor-1,1] =~ /\w/ || @word[@cursor-1,1] =~ /\W/) ? 1 : 2
-      n = (32..126).include?(@word[@cursor-1]) ? 1 : 2
-      n.times {@cursor -= 1}
+      char_width(@word[@cursor-1]).times {@cursor -= 1}
     end
   end
   
   def delete 
     get_cursor_from_array()
-    if @cursor < @word.length
-      #n = (@word[@cursor,1] =~ /\w/ || @word[@cursor,1] =~ /\W/) ? 1 : 2
-      n = (32..126).include?(@word[@cursor]) ? 1 : 2
-      n.times {@word[@cursor,1] = ''}
+    if @cursor < @word.bytesize
+      char_width(@word[@cursor]).times {@word[@cursor,1] = ''}
       @history.push(@word)
       word_changed()
     else
@@ -2521,9 +2492,7 @@ class RdicViewControll
     if @cursor == 0
       Curses.beep
     else
-      #n = (@word[@cursor-1,1] =~ /\w/ || @word[@cursor-1,1] =~ /\W/) ? 1 : 2
-      n = (32..126).include?(@word[@cursor-1]) ? 1 : 2
-      n.times {@cursor -= 1; @word[@cursor,1] = ''}
+      char_width(@word[@cursor-1]).times {@cursor -= 1; @word[@cursor,1] = ''}
       @history.push(@word)
       word_changed()
     end
@@ -2679,6 +2648,10 @@ class RdicViewControll
     Curses.addstr(msg)
   end
 
+  private
+  def char_width(chr)
+    chr.to_s.bytesize == 1 ? 1 : 2
+  end
 end
 
 class RdicView
@@ -2713,11 +2686,7 @@ class RdicView
       if match_offset
         standout_reg(slice_line, start_col, match_offset, indent_length)
       elsif start_col == 0
-        if RUBY_VERSION >= '1.8.0'
-          standout_word(slice_line)
-        else
-          non_standout(slice_line)
-        end
+        standout_word(slice_line)
       else
         if not @find_first_word
           if RdicMain::reverse
@@ -2732,6 +2701,7 @@ class RdicView
             non_standout(slice_line)
           end
         else
+          #RDIC_LOGGER.debug("paint_view: slice_line=<#{slice_line}>")
           Curses.addstr(slice_line)
         end
       end
@@ -2753,6 +2723,7 @@ class RdicView
   end
     
   def standout_word(line)
+    #RDIC_LOGGER.debug("standout_word: line=<#{line}>, encoding=<#{line.encoding}>")
     if line =~ /(^#{RdicMain::prefix})/
       Curses.addstr($1)
       line = $~.post_match
@@ -2809,6 +2780,7 @@ class RdicView
   end
   
   def standout_word2(line)
+    #RDIC_LOGGER.debug("standout_word2: line=<#{line}>")
     if line =~ /(^.*?)#{@separator}/
       @find_first_word = true
       Curses.attron(Curses::A_REVERSE)
@@ -2825,6 +2797,7 @@ class RdicView
   end
   
   def standout_word3(line)
+    #RDIC_LOGGER.debug("standout_word3: line=<#{line}>")
     if line =~ /(^.*?)#{@separator}/
       @find_second_word = true
       Curses.attron(Curses::A_BOLD)
@@ -2896,23 +2869,23 @@ class RdicSetPanel
   include RdicViewCommon
 
   SORTED_KEY_DESC = [
-    ["help_menu" , "ヘルプメニュー"],
-    ["switch_top"  , "キャンセル"],
-    ["move_next_cursor", "次の項目へ"],
-    ["move_prev_cursor", "前の項目へ"],
-    ["prev_word" , "前の行"],
-    ["next_word" , "次の行"],
-    ["search_start", "更新"]
+    [:help_menu, "ヘルプメニュー"],
+    [:switch_top  , "キャンセル"],
+    [:move_next_cursor, "次の項目へ"],
+    [:move_prev_cursor, "前の項目へ"],
+    [:prev_word , "前の行"],
+    [:next_word , "次の行"],
+    [:search_start, "更新"]
   ]
 
   DEFAULT_KEY_BIND = {
-    "f1"    => "help_menu",
-    "C-c"   => "switch_top",
-    "escape"   => "switch_top",
-    "C-b"   => "switch_top",
-    "tab"   => "move_next_cursor",
-    "C-i"   => "move_next_cursor",
-    "C-u"   => "move_prev_cursor"
+    "f1"    => :help_menu,
+    "C-c"   => :switch_top,
+    "escape"=> :switch_top,
+    "C-b"   => :switch_top,
+    "tab"   => :move_next_cursor,
+    "C-i"   => :move_next_cursor,
+    "C-u"   => :move_prev_cursor
   }
 
   X_YES  = 39
@@ -3281,9 +3254,7 @@ class RdicTextField
 
   def right 
     if @cursor < @text.length
-      #n = (@text[@cursor,1] =~ /\w/ || @text[@cursor,1] =~ /\W/) ? 1 : 2
-      n = (32..126).include?(@text[@cursor]) ? 1 : 2
-      n.times {@cursor += 1}
+      char_width(@text[@cursor]).times {@cursor += 1}
     else
       Curses.beep
     end
@@ -3293,17 +3264,13 @@ class RdicTextField
     if @cursor == 0
       Curses.beep
     else
-      #n = (@text[@cursor-1,1] =~ /\w/ || @text[@cursor-1,1] =~ /\W/) ? 1 : 2
-      n = (32..126).include?(@text[@cursor-1]) ? 1 : 2
-      n.times {@cursor -= 1}
+      char_width(@text[@cursor-1]).times {@cursor -= 1}
     end
   end
   
   def delete 
     if @cursor < @text.length
-      #n = (@text[@cursor,1] =~ /\w/ || @text[@cursor,1] =~ /\W/) ? 1 : 2
-      n = (32..126).include?(@text[@cursor]) ? 1 : 2
-      n.times {@text[@cursor,1] = ''}
+      char_width(@text[@cursor]).times {@text[@cursor,1] = ''}
       text_changed()
     else
       Curses.beep
@@ -3314,9 +3281,7 @@ class RdicTextField
     if @cursor == 0
       Curses.beep
     else
-      #n = (@text[@cursor-1,1] =~ /\w/ || @text[@cursor-1,1] =~ /\W/) ? 1 : 2
-      n = (32..126).include?(@text[@cursor-1]) ? 1 : 2
-      n.times {@cursor -= 1; @text[@cursor,1] = ''}
+      char_width(@text[@cursor-1]).times {@cursor -= 1; @text[@cursor,1] = ''}
       text_changed()
     end
   end
@@ -3356,6 +3321,10 @@ class RdicTextField
     end
   end
   
+  private
+  def char_width(chr)
+    chr.bytes.to_a.size == 1 ? 1 : 2
+  end
 end
 
 class RdicFilenameField < RdicTextField
@@ -3979,27 +3948,27 @@ class RdicHistoryPanel < RdicListBox
   PROMPT03_2 = "\t[OK]"
 
   SORTED_KEY_DESC = [
-    ["help_menu"   , "ヘルプメニュー"],
-    ["switch_top"  , "キャンセル"],
-    ["save"        , "ヒストリー検索保存"],
-    ["view"        , "ヒストリー検索保存表示"],
-    ["killtoeol"   , "削除"],
-    ["clear"       , "全件削除"],
-    ["undo"        , "アンドゥ"],
-    ["prev_word"   , "前の行"],
-    ["next_word"   , "次の行"],
-    ["search_start", "選択"],
+    [:help_menu   , "ヘルプメニュー"],
+    [:switch_top  , "キャンセル"],
+    [:save        , "ヒストリー検索保存"],
+    [:view        , "ヒストリー検索保存表示"],
+    [:killtoeol   , "削除"],
+    [:clear       , "全件削除"],
+    [:undo        , "アンドゥ"],
+    [:prev_word   , "前の行"],
+    [:next_word   , "次の行"],
+    [:search_start, "選択"],
   ]
 
   DEFAULT_KEY_BIND = {
-    "f1"     => "help_menu",
-    "C-b"    => "switch_top",
-    "escape" => "switch_top",
-    "C-s"    => "save",
-    "C-v"    => "view",
-    "C-k"    => "killtoeol",
-    "C-c"    => "clear",
-    "C-u"    => "undo",
+    "f1"     => :help_menu,
+    "C-b"    => :switch_top,
+    "escape" => :switch_top,
+    "C-s"    => :save,
+    "C-v"    => :view,
+    "C-k"    => :killtoeol,
+    "C-c"    => :clear,
+    "C-u"    => :undo,
   }
 
   def initialize(root, container, h, w, top, width)
@@ -4019,8 +3988,8 @@ class RdicHistoryPanel < RdicListBox
 
   def search_start
     if @container[@cur]
-      RdicMain::put_msg(['erase'])
-      RdicMain::put_msg(['typestring_from_selection', @container[@cur].dup])
+      RdicMain::put_msg([:erase])
+      RdicMain::put_msg([:typestring_from_selection, @container[@cur].dup])
     end
     switch_top()
   end
@@ -4121,7 +4090,7 @@ class RdicHistoryPanel < RdicListBox
   end
 
   def switch_top
-    RdicMain::put_msg(['reset_history', @container.reverse]) if @changed
+    RdicMain::put_msg([:reset_history, @container.reverse]) if @changed
     RdicMain::down_pane()
   end
 
@@ -4136,7 +4105,7 @@ class RdicFuzzyPanel < RdicListBox
   
   def search_start
     if @container[@cur]
-      RdicMain::put_msg(['shift_fuzzy', @cur])
+      RdicMain::put_msg([:shift_fuzzy, @cur])
     end
     switch_top()
   end
@@ -4173,35 +4142,14 @@ module RdicMain
   @xselection_open = false
   KIGOU = '　、。，．・：；？！゛゜´｀¨＾‾＿ヽヾゝゞ〃仝々〆〇‐／＼〜‖｜…‥‘’“”（）〔〕［］｛｝〈〉《》「」『』【】＋−±×÷＝≠＜＞≦≧∞∴♂♀°′″℃¥＄¢£％＃＆＊＠§☆★○●◎◇◆□■△▲▽▼※〒→←↑↓〓∈∋⊆⊇⊂⊃∪∩∧∨¬⇒⇔∀∃∠⊥⌒∂∇≡≒≪≫√∽∝∵∫∬Å‰♯♭♪†‡¶◯'
   
-# begin
-#  require 'uconv'
-#    def u2e(chunk)
-#      chunk.gsub(/\\u([0-9A-Fa-f]{2})([0-9A-Fa-f]{2})/) {
-#        Uconv::u16toeuc("%c%c" % [$2.hex, $1.hex])
-#      }
-#    end
-#  rescue LoadError
-#  def u2e(chunk)
-#    chunk
-#  end
-# end
-
-# added by nari 2011-11-20
-begin
-  require 'nkf'
-  def u2e(chunk)
-    NKF.nkf("-e", chunk)
-  end
-end
-
   
   def trapmsg
     oldstate=Thread.critical
     Thread.critical=true
     curses_close()
     curses_init()
-    @pane_q.last.delegete_to_ctl('redraw')
-    @pane_q.last.delegete_to_ctl('paint') # because this thread is not main.
+    @pane_q.last.delegete_to_ctl(:redraw)
+    @pane_q.last.delegete_to_ctl(:paint) # because this thread is not main.
     Thread.critical=oldstate
   end
   
@@ -4241,7 +4189,7 @@ end
     @block = @block_status_q.last
     Curses.clear
     @pane_q.pop()
-    @pane_q.last.delegete_to_ctl('redraw')
+    @pane_q.last.delegete_to_ctl(:redraw)
   end
 
   def set_root_pane(pane, block)
@@ -4285,14 +4233,19 @@ end
   def msg_get_loop
     GC.start
     while(msg = @msg_q.shift)
-      method_name, input_chr = msg 
+      method_name, input_chr = msg
+      #RDIC_LOGGER.debug([@pane_q.last.class, method_name, input_chr].inspect)
       @pane_q.last.delegete_to_ctl(method_name,input_chr)
     end
-    @pane_q.last.delegete_to_ctl('paint')
+    @pane_q.last.delegete_to_ctl(:paint)
     blocktime = (@block) ? nil : @blocktime
     get_msg(@pane_q.last,blocktime) {|method_name,input_chr|
       put_msg([method_name,input_chr])
     }
+  rescue
+    #RDIC_LOGGER.debug($!)
+    #RDIC_LOGGER.debug($!.backtrace)
+    raise
   end
   
   def put_msg(msg)
@@ -4315,8 +4268,10 @@ end
     peek_stop = false
     while msgq.empty? && !(peek_stop)
       if IO.select([$stdin],[],[],blocktime)
-        c_int = $stdin.getc
-        if c_int == 27 # Esc
+        c = $stdin.getc
+        c_int = c.bytes.first
+        #RDIC_LOGGER.debug("get_msg: c_int=<#{c_int.inspect}>, c=<#{c_int.chr}>")
+        if c == 27 # Esc
           escape_sequence << c_int.chr
           blocktime = 0.01
         elsif (0..127).include?(c_int) # 127 is delete key
@@ -4329,13 +4284,13 @@ end
                     msgq << pane.keybind(keynm)
               end
             else
-              msgq << ['typestring', c_int.chr] unless (0..31).include?(c_int)
+              msgq << [:typestring, c] unless (0..31).include?(c_int)
             end
           end
         else
-          kanji = kanji + c_int.chr
+          kanji = kanji + c
           if kanji.length == 2
-            msgq << ['typestring', kanji]
+            msgq << [:typestring, kanji]
             kanji = ''
           #else
             #blocktime = 0
@@ -4378,8 +4333,7 @@ end
     end
     str = @xselection.check()
     if str
-      # added by nari 2011-11-20
-      str = u2e(str)
+      str = str.force_encoding('UTF-8')
       str.gsub!(/\n/,' ')
       str.gsub!(/\s+/,' ')
       if (len = str.length) > @max_xselection_length
@@ -4389,7 +4343,7 @@ end
           len = @max_xselection_length-1
         end
       end
-      msg << ["typestring_from_selection", str[0, len]]
+      msg << [:typestring_from_selection, str[0, len]]
     end
     return msg
   end
@@ -4397,12 +4351,8 @@ end
 end
 
 if $0 == __FILE__
-  # require 'kconv'
-  require 'jcode'
   require 'getoptlong.rb'
   
-  $KCODE = "e"
-
   # defaults
   path=ENV['HOME']+'/.rdic'+RUBY_VERSION[0..-3]+'/'
   separator = ' : '
@@ -4415,7 +4365,7 @@ if $0 == __FILE__
   reverse = false
   indent = 1
   config = ''
-  list_regexp = /^\241(?=\332)|^・/ # \241\332 == "【"
+  list_regexp = /^【|^・/
   example = /^【用例|^・/
   max_xselection_length = 1000
   history_depth = 500
@@ -4449,7 +4399,7 @@ if $0 == __FILE__
     print " ヒストリーファイルは $HOME/.rdic#{RUBY_VERSION[0..-3]}/history\n"
     print "\n"
     print "キー情報ファイルは $HOME/.rdic#{RUBY_VERSION[0..-3]}/$TERM.key が使われます\n"
-    print "例) $ rdic /var/dic/EIJIRO52.euc /var/dic/WAEIJI52.euc\n"
+    print "例) $ rdic /var/dic/EIJIRO52.utf /var/dic/WAEIJI52.utf\n"
     exit(0)
   end
   
@@ -4607,7 +4557,7 @@ if $0 == __FILE__
     RdicMain::rdicmgr = rdicmgr
     
     if xselection
-      require 'xselection'
+      require_relative 'xselection'
     else
       module RdicMain
         undef_method :get_selection
